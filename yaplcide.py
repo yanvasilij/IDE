@@ -131,7 +131,8 @@ features.catalog.append(('yaplcconfig',
                          'yaplcconfig.yaplcconfig.YAPLCNodeConfig'))
 
 
-from Beremiz import *
+if __name__ == '__main__':
+    from Beremiz import *
 
 
 # -------------------------------------------------------------------------------
