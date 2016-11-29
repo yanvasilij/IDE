@@ -1,0 +1,9 @@
+      <xsd:element name="MKLogik200">
+        <xsd:complexType>
+          <xsd:attribute name="Compiler" type="xsd:string" use="optional" default="arm-none-eabi-gcc"/>
+          <xsd:attribute name="CFLAGS" type="xsd:string" use="optional" default="-mcpu=cortex-m3 -ffunction-sections -mlittle-endian -mthumb -g -D STM32F407xx -D USE_HAL_DRIVER"/>
+          <xsd:attribute name="Linker" type="xsd:string" use="optional" default="arm-none-eabi-g++"/>
+          <xsd:attribute name="LDFLAGS" type="xsd:string" use="optional" default="-Wall -mcpu=cortex-m3 -Wl,--gc-section -mlittle-endian -mthumb -Wl,-Map -Wl,D:\beremizProjects\modbusSlave\build\main.map"/>
+          <xsd:attribute name="STM32Config" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>

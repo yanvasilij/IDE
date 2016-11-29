@@ -4,3 +4,4 @@
 *.py~
 *directory
 *~
+/run.bat
