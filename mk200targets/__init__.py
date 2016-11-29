@@ -1,5 +1,9 @@
+"""
+@brief Target class for mk200
+@Author yanvasilij
+"""
 import os
-from ..toolchain_gcc import toolchain_gcc
+from toolchain_gcc import toolchain_gcc
 
 class MKLogik200_target(toolchain_gcc):
     dlopen_prefix = ""
@@ -42,4 +46,8 @@ class MKLogik200_target(toolchain_gcc):
         includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\..\FreeModbus\xCpp\include')
         stm32_cflags = self.getSTM32Config("cflags") + includePathes
         return toolchain_gcc.getBuilderCFLAGS(self) + stm32_cflags # + ["-fPIC"]
+
+_base_path = path.split(__file__)[0]
+mk200targets = {'MKLogik200': {'code': {'plc_MKLogik200_main.c': path.join(_base_path, 'plc_MKLogik200_main.c')},
+                               'class': MKLogik200_target, 'xsd':path.join(_base_path, 'XSD')}}
 
