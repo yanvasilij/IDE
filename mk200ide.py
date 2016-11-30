@@ -25,6 +25,7 @@ features.catalog = [
     ('MK200ModubsRequest', _('MK200 Modbus master request'), _('Plugin for MK201'), 'mk200modules.ModbusMaster.MK200ModbusRequestFile') ]
 
 from mk200targets import mk200targets
+targets.targets = {}
 targets.targets.update(mk200targets)
 
 if __name__ == '__main__':
