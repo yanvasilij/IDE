@@ -25,7 +25,6 @@ class MKLogik200_target(toolchain_gcc):
         objFile = os.path.dirname(os.path.realpath(__file__))
         objFile = "".join(os.path.split(objFile)[0])
         objFile = "".join(os.path.split(objFile)[0])
-        objFile = "".join(os.path.split(objFile)[0])
         objFileDir = objFile + r'/beremizStm32Port/CMakeFiles/BeremizPort.elf.dir'
 
         additionalobjects = []
@@ -47,7 +46,7 @@ class MKLogik200_target(toolchain_gcc):
         stm32_cflags = self.getSTM32Config("cflags") + includePathes
         return toolchain_gcc.getBuilderCFLAGS(self) + stm32_cflags # + ["-fPIC"]
 
-_base_path = path.split(__file__)[0]
-mk200targets = {'MKLogik200': {'code': {'plc_MKLogik200_main.c': path.join(_base_path, 'plc_MKLogik200_main.c')},
-                               'class': MKLogik200_target, 'xsd':path.join(_base_path, 'XSD')}}
+_base_path = os.path.split(__file__)[0]
+mk200targets = {'MKLogik200': {'code': {'plc_MKLogik200_main.c': os.path.join(_base_path, 'plc_MKLogik200_main.c')},
+                               'class': lambda: MKLogik200_target, 'xsd':os.path.join(_base_path, 'XSD')}}
 
