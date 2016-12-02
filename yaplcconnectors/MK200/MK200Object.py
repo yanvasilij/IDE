@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
 from threading import Lock
 import ctypes
-from yaplcconnectors.YAPLC.YAPLCProto import *
+from MK200Proto import *
 from targets.typemapping import LogLevelsCount, TypeTranslator, UnpackDebugBuffer
 from util.ProcessLogger import ProcessLogger
 
@@ -88,7 +88,7 @@ class MK200Object():
         if self.MatchMD5(md5sum) == False:
             res = None;
             failure = None;
-            
+
             self.HandleSerialTransaction(SETRTCTransaction())
             
             self.confnodesroot.logger.write_warning(
@@ -102,7 +102,7 @@ class MK200Object():
             # bootloader command
             # data contains full command line except serial port string which is passed to % operator
             # cmd = data % self.SerialConnection.port
-            cmd = [token % {"serial_port": self.SerialConnection.port} for token in data]
+            cmd = ["b", "b"]# [token % {"serial_port": self.SerialConnection.port} for token in data]
             # wrapper to run command in separate window
             cmdhead = []
             cmdtail = []
@@ -142,21 +142,12 @@ class MK200Object():
             return self.PLCStatus == "Stopped"
 
     def GetPLCstatus(self):
-        strcounts = self.HandleSerialTransaction(GET_LOGCOUNTSTransaction())
-        if strcounts is not None and len(strcounts) == LogLevelsCount * 4:
-            cstrcounts = ctypes.create_string_buffer(strcounts)
-            ccounts = ctypes.cast(cstrcounts, ctypes.POINTER(ctypes.c_uint32))
-            counts = [int(ccounts[idx]) for idx in xrange(LogLevelsCount)]
-        else:
-            counts = [0] * LogLevelsCount
-        return self.PLCStatus, counts
+        self.HandleSerialTransaction(GET_LOGCOUNTSTransaction())
+        return "Stopped", [1]
 
     def MatchMD5(self, MD5):
-        self.MatchSwitch = False
-        data = self.HandleSerialTransaction(GET_PLCIDTransaction())
-        self.MatchSwitch = True
-        if data is not None:
-            return data[:32] == MD5[:32]
+        print "MatchMD5"
+        #md5 checking hasn't realised yet
         return False
 
     def SetTraceVariablesList(self, idxs):
