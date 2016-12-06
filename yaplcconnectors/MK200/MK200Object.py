@@ -102,7 +102,8 @@ class MK200Object():
             # bootloader command
             # data contains full command line except serial port string which is passed to % operator
             # cmd = data % self.SerialConnection.port
-            cmd = ["b", "b"]# [token % {"serial_port": self.SerialConnection.port} for token in data]
+            # cmd = [token % {"serial_port": self.SerialConnection.port} for token in data]
+            cmd = []
             # wrapper to run command in separate window
             cmdhead = []
             cmdtail = []
@@ -146,7 +147,6 @@ class MK200Object():
         return "Stopped", [1]
 
     def MatchMD5(self, MD5):
-        print "MatchMD5"
         #md5 checking hasn't realised yet
         return False
 

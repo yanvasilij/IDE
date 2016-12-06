@@ -38,6 +38,7 @@ class toolchain_gcc():
         self.CTRInstance = CTRInstance
         self.buildpath = None
         self.SetBuildPath(self.CTRInstance._getBuildPath())
+        self.HexFile = None
     
     def getBuilderCFLAGS(self):
         """
@@ -54,10 +55,10 @@ class toolchain_gcc():
 
     def GetBinaryCode(self):
         try:
-            return open(self.exe_path, "rb").read()
+            return open(self.HexFile, "rb").read()
         except Exception, e:
             return None
-        
+
     def _GetMD5FileName(self):
         return os.path.join(self.buildpath, "lastbuildPLC.md5")
 
@@ -137,14 +138,14 @@ class toolchain_gcc():
                     objectfilename = os.path.splitext(CFile)[0]+".o"
 
                     match = self.check_and_update_hash_and_deps(bn)
-                    
+
                     if match:
                         self.CTRInstance.logger.write("   [pass]  "+bn+" -> "+obn+"\n")
                     else:
                         relink = True
 
                         self.CTRInstance.logger.write("   [CC]  "+bn+" -> "+obn+"\n")
-                        
+
                         status, result, err_result = ProcessLogger(
                                self.CTRInstance.logger,
                                "\"%s\" -c \"%s\" -o \"%s\" %s %s"%
@@ -166,14 +167,15 @@ class toolchain_gcc():
         self.CTRInstance.logger.write(_("Linking :\n"))
         if relink:
             objstring = []
-    
+
             # Generate list .o files
             listobjstring = '"' + '"  "'.join(objs) + '"'
-    
+
             ALLldflags = ' '.join(self.getBuilderLDFLAGS())
-    
+
             self.CTRInstance.logger.write("   [CC]  " + ' '.join(obns)+" -> " + self.exe + "\n")
-    
+
+            # in self.linker full path to linker file
             status, result, err_result = ProcessLogger(
                    self.CTRInstance.logger,
                    "\"%s\" %s -o \"%s\" %s"%
@@ -185,7 +187,24 @@ class toolchain_gcc():
             
             if status :
                 return False
-                
+
+            self.HexFile = None
+            hexfile = "" + os.path.splitext(self.exe_path)[0] + ".hex"
+            objcopyapp = os.path.split(self.linker)[0]
+            objcopyapp = os.path.join (objcopyapp, "arm-none-eabi-objcopy.exe")
+            status, result, err_result = ProcessLogger(
+                self.CTRInstance.logger,
+                "%s -Oihex %s %s"%
+                (objcopyapp,
+                 self.exe_path,
+                 hexfile)
+            ).spin()
+
+            if status :
+                return False
+
+            self.HexFile = hexfile
+
         else:
             self.CTRInstance.logger.write("   [pass]  " + ' '.join(obns)+" -> " + self.exe + "\n")
         
