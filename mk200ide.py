@@ -56,6 +56,7 @@ if __name__ == '__main__':
     InstallLocalRessources(_beremiz_folder)
 
 from Beremiz import *
+ProjectController.GetDefaultTargetName = lambda x: "MKLogik200"
 
 # This is where we start our application
 if __name__ == '__main__':
