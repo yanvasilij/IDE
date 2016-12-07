@@ -38,8 +38,7 @@ class toolchain_gcc():
         self.CTRInstance = CTRInstance
         self.buildpath = None
         self.SetBuildPath(self.CTRInstance._getBuildPath())
-        self.HexFile = None
-    
+
     def getBuilderCFLAGS(self):
         """
         Returns list of builder specific CFLAGS
@@ -55,7 +54,8 @@ class toolchain_gcc():
 
     def GetBinaryCode(self):
         try:
-            return open(self.HexFile, "rb").read()
+            hexfile = "" + os.path.splitext(self.exe_path)[0] + ".hex"
+            return open(hexfile, "rb").read()
         except Exception, e:
             return None
 
@@ -188,7 +188,6 @@ class toolchain_gcc():
             if status :
                 return False
 
-            self.HexFile = None
             hexfile = "" + os.path.splitext(self.exe_path)[0] + ".hex"
             objcopyapp = os.path.split(self.linker)[0]
             objcopyapp = os.path.join (objcopyapp, "arm-none-eabi-objcopy.exe")
@@ -202,8 +201,6 @@ class toolchain_gcc():
 
             if status :
                 return False
-
-            self.HexFile = hexfile
 
         else:
             self.CTRInstance.logger.write("   [pass]  " + ' '.join(obns)+" -> " + self.exe + "\n")
