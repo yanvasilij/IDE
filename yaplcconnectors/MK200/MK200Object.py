@@ -97,6 +97,7 @@ class MK200Object():
             # Will now boot target
             res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
             time.sleep(3)
+            res, failure = self._HandleSerialTransaction(DownloadTransaction(data), False)
             # Close connection
             self.SerialConnection.Close()
             # bootloader command

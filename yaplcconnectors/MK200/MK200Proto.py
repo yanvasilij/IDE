@@ -31,6 +31,13 @@ class MK200Transaction (YAPLCTransaction):
         return None
 
 
+class MK200BinaryTransaction (MK200Transaction):
+
+    def SendCommand(self):
+        for ch in self.Command:
+            self.SerialPort.Write(ch)
+
+
 
 class STARTTransaction(MK200Transaction):
     def __init__(self):
@@ -51,6 +58,25 @@ class STOPTransaction(MK200Transaction):
 class BOOTTransaction(MK200Transaction):
     def __init__(self):
         MK200Transaction.__init__(self, "Boot trasaction\r")
+
+
+class DownloadTransaction(MK200Transaction):
+    def __init__(self, data):
+        lines = data.splitlines()
+        firstline = lines[0]
+        # hex-file format is :LLAAAATTDD...CC, where LL - lenght in bytes of DD, AAAA - low 2 bytes of address,
+        # TT - type (could be 00 - binary data, 01 - EOF, 02 - segment address, 03 - start segment adress record,
+        # 04 - write extended address, 05 -  Start Linear Address Record
+        if (':02' not in firstline) or ('04' not in firstline[7:9]):
+            print "Invalid hex-file"
+            return
+        bindata = []
+        for line in lines[1:]:
+            len = int(line[1:3], 16)
+            for i in range(0, len):
+                bindata.append(int(line[9+i*2:9+i*2+2], 16))
+        bindatastring = ''.join([chr(item) for item in bindata])
+        MK200Transaction.__init__(self, bindatastring)
 
 
 class SET_TRACE_VARIABLETransaction(MK200Transaction):
