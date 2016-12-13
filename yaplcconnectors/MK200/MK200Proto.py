@@ -5,18 +5,21 @@
 #from PLCManager
 
 from yaplcconnectors.YAPLC.YAPLCProto import *
+from MK200Serial import *
 
-class TestTransaction(YAPLCTransaction):
-    def __init__(self):
-        YAPLCTransaction.__init__(self, "Try to connect to target\r")
+MAX_CMD_LEN = 200
 
-    def SendCommand(self):
-        # send command thread
-        self.SerialPort.Write(self.Command)
 
-    def GetCommandAck(self):
-        return 0x55
+class MK200Proto(YAPLCProto):
 
+    def __init__(self, libfile, port, baud, timeout):
+        # serialize access lock
+        self.port = port
+        self.baud = baud
+        self.timeout = timeout
+        # open serial port
+        self.SerialPort = MK200Serial(libfile)
+        self.Open()
 
 class MK200Transaction (YAPLCTransaction):
 
@@ -25,6 +28,8 @@ class MK200Transaction (YAPLCTransaction):
         self.SerialPort.Write(self.Command)
 
     def GetCommandAck(self):
+        res = self.SerialPort.Read(MAX_CMD_LEN)
+        print res
         return 0x55
 
     def GetData(self):
@@ -57,7 +62,15 @@ class STOPTransaction(MK200Transaction):
 
 class BOOTTransaction(MK200Transaction):
     def __init__(self):
-        MK200Transaction.__init__(self, "Boot trasaction\r")
+        MK200Transaction.__init__(self, "Boot\r\n")
+
+    def GetCommandAck(self):
+        res = self.SerialPort.Read(50)
+        print res
+        if res == "Done\r\n":
+            return 0x55
+        else:
+            return None
 
 
 class DownloadTransaction(MK200Transaction):
@@ -81,32 +94,32 @@ class DownloadTransaction(MK200Transaction):
 
 class SET_TRACE_VARIABLETransaction(MK200Transaction):
     def __init__(self, data):
-        YAPLCTransaction.__init__(self, "SET_TRACE_VARIABLETransaction\r")
+        YAPLCTransaction.__init__(self, "SET_TRACE_VARIABLETransaction\r\n")
 
 
 class GET_TRACE_VARIABLETransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "GET_TRACE_VARIABLETransaction\r")
+        YAPLCTransaction.__init__(self, "GET_TRACE_VARIABLETransaction\r\n")
 
 
 class GET_PLCIDTransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "GET_PLCIDTransaction\r")
+        YAPLCTransaction.__init__(self, "GET_PLCIDTransaction\r\n")
 
 
 class GET_LOGCOUNTSTransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "GET_LOGCOUNTSTransaction\r")
+        YAPLCTransaction.__init__(self, "GET_LOGCOUNTSTransaction\r\n")
 
 
 class GET_LOGMSGTransaction(MK200Transaction):
     def __init__(self,level,msgid):
-        YAPLCTransaction.__init__(self, "GET_LOGMSGTransaction\r")
+        YAPLCTransaction.__init__(self, "GET_LOGMSGTransaction\r\n")
 
 
 class RESET_LOGCOUNTSTransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "RESET_LOGCOUNTSTransaction\r")
+        YAPLCTransaction.__init__(self, "RESET_LOGCOUNTSTransaction\r\n")
 
 
 class SETRTCTransaction(MK200Transaction):

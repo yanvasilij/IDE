@@ -42,7 +42,7 @@ class MK200Object():
         self.TransactionLock.release()
 
     def connect(self, libfile, comportstr, baud, timeout):
-        self.SerialConnection = YAPLCProto(libfile, comportstr, baud, timeout)
+        self.SerialConnection = MK200Proto(libfile, comportstr, 115200, 1)
 
     def _HandleSerialTransaction(self, transaction, must_do_lock):
         res = None
@@ -97,7 +97,7 @@ class MK200Object():
             # Will now boot target
             res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
             time.sleep(3)
-            res, failure = self._HandleSerialTransaction(DownloadTransaction(data), False)
+            # res, failure = self._HandleSerialTransaction(DownloadTransaction(data), False)
             # Close connection
             self.SerialConnection.Close()
             # bootloader command
