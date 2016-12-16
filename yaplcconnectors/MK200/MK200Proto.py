@@ -21,6 +21,20 @@ class MK200Proto(YAPLCProto):
         self.SerialPort = MK200Serial(libfile)
         self.Open()
 
+    def HandleTransaction(self, transaction):
+        try:
+            transaction.SetSerialPort(self.SerialPort)
+            # send command, wait ack (timeout)
+            transaction.SendCommand()
+            current_plc_status = transaction.GetCommandAck()
+            if current_plc_status is not None:
+                res = transaction.ExchangeData()
+        except Exception, e:
+            msg = "PLC protocol transaction error : "+str(e)
+            raise YAPLCProtoError( msg )
+        return YAPLC_STATUS.get(current_plc_status,"Broken"), res
+
+
 class MK200Transaction (YAPLCTransaction):
 
     def SendCommand(self):
@@ -51,12 +65,12 @@ class STARTTransaction(MK200Transaction):
 
 class IDLETransaction(MK200Transaction):
     def __init__(self):
-        MK200Transaction.__init__(self, "Idle transaction\r")
+        MK200Transaction.__init__(self, "Idle transaction\r\n")
 
 
 class STOPTransaction(MK200Transaction):
     def __init__(self):
-        MK200Transaction.__init__(self, "Stop trasaction\r")
+        MK200Transaction.__init__(self, "BootEnd\r\n")
         #ExchangeData = YAPLCTransaction.GetData
 
 
@@ -74,7 +88,8 @@ class BOOTTransaction(MK200Transaction):
 
 
 class DownloadTransaction(MK200Transaction):
-    def __init__(self, data):
+    def __init__(self, data, controller):
+        self.Controller = controller
         lines = data.splitlines()
         firstline = lines[0]
         # hex-file format is :LLAAAATTDD...CC, where LL - lenght in bytes of DD, AAAA - low 2 bytes of address,
@@ -85,11 +100,24 @@ class DownloadTransaction(MK200Transaction):
             return
         bindata = []
         for line in lines[1:]:
-            len = int(line[1:3], 16)
-            for i in range(0, len):
+            datalen = int(line[1:3], 16)
+            for i in range(0, datalen):
                 bindata.append(int(line[9+i*2:9+i*2+2], 16))
         bindatastring = ''.join([chr(item) for item in bindata])
         MK200Transaction.__init__(self, bindatastring)
+
+    def GetCommandAck(self):
+        res = self.SerialPort.Read(50)
+        print res
+        if res == "Done\r\n":
+            print "Download successful!"
+        return 0x55
+
+    def SendCommand(self):
+        for i, byte in enumerate(self.Command):
+            progress = int(i * 100 / len(self.Command))
+            self.Controller.ShowPLCProgress("Flashing", progress)
+            self.SerialPort.Write(byte)
 
 
 class SET_TRACE_VARIABLETransaction(MK200Transaction):
@@ -109,7 +137,7 @@ class GET_PLCIDTransaction(MK200Transaction):
 
 class GET_LOGCOUNTSTransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "GET_LOGCOUNTSTransaction\r\n")
+        YAPLCTransaction.__init__(self, "GetPlcStatus\r\n")
 
 
 class GET_LOGMSGTransaction(MK200Transaction):
@@ -124,5 +152,5 @@ class RESET_LOGCOUNTSTransaction(MK200Transaction):
 
 class SETRTCTransaction(MK200Transaction):
     def __init__(self):
-        YAPLCTransaction.__init__(self, "SETRTCTransaction\r")
+        YAPLCTransaction.__init__(self, "SETRTCTransaction\r\n")
 

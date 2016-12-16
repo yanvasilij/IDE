@@ -34,7 +34,7 @@ class MK200Object():
 
         self.TransactionLock.acquire()
         try:
-            self.connect(libfile, comportstr, 57600, 20)
+            self.connect(libfile, comportstr, 115200, 20)
         except Exception, e:
             self.confnodesroot.logger.write_error(str(e) + "\n")
             self.SerialConnection = None
@@ -97,38 +97,11 @@ class MK200Object():
             # Will now boot target
             res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
             time.sleep(3)
-            # res, failure = self._HandleSerialTransaction(DownloadTransaction(data), False)
+            res, failure = self._HandleSerialTransaction(DownloadTransaction(data, self.confnodesroot), False)
             # Close connection
             self.SerialConnection.Close()
             # bootloader command
             # data contains full command line except serial port string which is passed to % operator
-            # cmd = data % self.SerialConnection.port
-            # cmd = [token % {"serial_port": self.SerialConnection.port} for token in data]
-            cmd = []
-            # wrapper to run command in separate window
-            cmdhead = []
-            cmdtail = []
-            if os.name in ("nt", "ce"):
-                # cmdwrap = "start \"Loading PLC, please wait...\" /wait %s \r"
-                cmdhead.append("cmd")
-                cmdhead.append("/c")
-                cmdhead.append("start")
-                cmdhead.append("Loading PLC, please wait...")
-                cmdhead.append("/wait")
-            else:
-                # cmdwrap = "xterm -e %s \r"
-                cmdhead.append("xterm")
-                cmdhead.append("-e")
-                # Load a program
-                # try:
-                # os.system( cmdwrap % command )
-            # except Exception,e:
-            #    failure = str(e)
-            command = cmdhead + cmd + cmdtail;
-            status, result, err_result = ProcessLogger(self.confnodesroot.logger, command).spin()
-            """
-                    TODO: Process output?
-            """
             # Reopen connection
             self.SerialConnection.Open()
             self.TransactionLock.release()
@@ -306,3 +279,4 @@ if __name__ == "__main__":
     TstPLC.StopPLC()
 
     time.sleep(3)
+
