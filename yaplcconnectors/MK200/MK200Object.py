@@ -96,8 +96,8 @@ class MK200Object():
             self.TransactionLock.acquire()
             # Will now boot target
             res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
-            time.sleep(3)
             res, failure = self._HandleSerialTransaction(DownloadTransaction(data, self.confnodesroot), False)
+            time.sleep(0.5)
             # Close connection
             self.SerialConnection.Close()
             # bootloader command

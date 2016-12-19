@@ -6,6 +6,8 @@
 
 from yaplcconnectors.YAPLC.YAPLCProto import *
 from MK200Serial import *
+import copy
+import wx
 
 MAX_CMD_LEN = 200
 
@@ -80,7 +82,6 @@ class BOOTTransaction(MK200Transaction):
 
     def GetCommandAck(self):
         res = self.SerialPort.Read(50)
-        print res
         if res == "Done\r\n":
             return 0x55
         else:
@@ -88,36 +89,54 @@ class BOOTTransaction(MK200Transaction):
 
 
 class DownloadTransaction(MK200Transaction):
+
     def __init__(self, data, controller):
         self.Controller = controller
         lines = data.splitlines()
         firstline = lines[0]
+        self.HexLineTypes = {"04": "Extended Linear Address", "00": "Data", "01": "End of file", "05": "Start linear Address"}
+        self.DefauleLineType = {"Type":"Data", "Len": 0, "Address": 0, "Data": ""}
         # hex-file format is :LLAAAATTDD...CC, where LL - lenght in bytes of DD, AAAA - low 2 bytes of address,
         # TT - type (could be 00 - binary data, 01 - EOF, 02 - segment address, 03 - start segment adress record,
         # 04 - write extended address, 05 -  Start Linear Address Record
-        if (':02' not in firstline) or ('04' not in firstline[7:9]):
+        parsed = self.ParseLineFromHex(firstline)
+        if (parsed["Type"] != "Extended Linear Address") or (parsed["Len"] != 2):
             print "Invalid hex-file"
             return
         bindata = []
         for line in lines[1:]:
-            datalen = int(line[1:3], 16)
-            for i in range(0, datalen):
-                bindata.append(int(line[9+i*2:9+i*2+2], 16))
-        bindatastring = ''.join([chr(item) for item in bindata])
+            parsed = self.ParseLineFromHex(line)
+            if parsed["Type"] == "Extended Linear Address":
+                if parsed["Data"][0] != 8:
+                    break
+                continue
+            if parsed["Len"] > 0:
+                bindata.extend(parsed["Data"])
+        bindatastring = 'Download\r\n' + ''.join([chr(item) for item in bindata])
         MK200Transaction.__init__(self, bindatastring)
+
+    def ParseLineFromHex(self, line):
+        parsed = copy.deepcopy(self.DefauleLineType)
+        recordtype = line[7:9]
+        if recordtype in self.HexLineTypes.keys():
+            bindata = []
+            parsed["Type"] = self.HexLineTypes[recordtype]
+            parsed["Len"] = int(line[1:3], 16)
+            parsed["Address"] = int(line[9:13], 16)
+            for i in range(0, parsed["Len"]):
+                bindata.append(int(line[9+i*2:9+i*2+2], 16))
+            parsed["Data"] = copy.copy(bindata)
+        return parsed
 
     def GetCommandAck(self):
         res = self.SerialPort.Read(50)
-        print res
         if res == "Done\r\n":
             print "Download successful!"
         return 0x55
 
     def SendCommand(self):
-        for i, byte in enumerate(self.Command):
-            progress = int(i * 100 / len(self.Command))
-            self.Controller.ShowPLCProgress("Flashing", progress)
-            self.SerialPort.Write(byte)
+        self.SerialPort.Write(self.Command)
+        time.sleep(0.5)
 
 
 class SET_TRACE_VARIABLETransaction(MK200Transaction):
