@@ -99,19 +99,29 @@ class DownloadTransaction(MK200Transaction):
         # hex-file format is :LLAAAATTDD...CC, where LL - lenght in bytes of DD, AAAA - low 2 bytes of address,
         # TT - type (could be 00 - binary data, 01 - EOF, 02 - segment address, 03 - start segment adress record,
         # 04 - write extended address, 05 -  Start Linear Address Record
+        # first - parse first line it must be exact format
         parsed = self.ParseLineFromHex(firstline)
         if (parsed["Type"] != "Extended Linear Address") or (parsed["Len"] != 2):
             print "Invalid hex-file"
             return
         bindata = []
+        lastParsed = None
         for line in lines[1:]:
             parsed = self.ParseLineFromHex(line)
             if parsed["Type"] == "Extended Linear Address":
                 if parsed["Data"][0] != 8:
                     break
                 continue
+            if lastParsed != None:
+                emptySpaceLen = parsed["Address"] - lastParsed["Address"] - lastParsed["Len"]
+            else:
+                emptySpaceLen = 0
+            if emptySpaceLen > 0:
+                for i in range(0, emptySpaceLen):
+                    bindata.append(0xFF)
             if parsed["Len"] > 0:
                 bindata.extend(parsed["Data"])
+            lastParsed = parsed
         bindatastring = 'Download\r\n' + ''.join([chr(item) for item in bindata])
         MK200Transaction.__init__(self, bindatastring)
 
@@ -122,7 +132,10 @@ class DownloadTransaction(MK200Transaction):
             bindata = []
             parsed["Type"] = self.HexLineTypes[recordtype]
             parsed["Len"] = int(line[1:3], 16)
-            parsed["Address"] = int(line[9:13], 16)
+            if parsed["Type"] == "Data":
+                parsed["Address"] = int(line[3:7], 16)
+            else:
+                parsed["Address"] = int(line[9:13], 16)
             for i in range(0, parsed["Len"]):
                 bindata.append(int(line[9+i*2:9+i*2+2], 16))
             parsed["Data"] = copy.copy(bindata)
