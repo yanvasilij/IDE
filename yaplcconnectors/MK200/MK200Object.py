@@ -25,6 +25,7 @@ import pdb
 class MK200Object():
     def __init__(self, libfile, confnodesroot, comportstr):
 
+        self.IsProgramming = False
         self.TransactionLock = Lock()
         self.PLCStatus = "Disconnected"
         self.libfile = libfile
@@ -88,6 +89,7 @@ class MK200Object():
         if self.MatchMD5(md5sum) == False:
             res = None;
             failure = None;
+            self.IsProgramming = True
 
             self.HandleSerialTransaction(SETRTCTransaction())
             
@@ -96,10 +98,12 @@ class MK200Object():
             self.TransactionLock.acquire()
             # Will now boot target
             res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
+            time.sleep(0.8)
             res, failure = self._HandleSerialTransaction(DownloadTransaction(data, self.confnodesroot), False)
             time.sleep(0.5)
             # Close connection
             self.SerialConnection.Close()
+            self.IsProgramming = False
             # bootloader command
             # data contains full command line except serial port string which is passed to % operator
             # Reopen connection
@@ -117,8 +121,13 @@ class MK200Object():
             return self.PLCStatus == "Stopped"
 
     def GetPLCstatus(self):
-        self.HandleSerialTransaction(GET_LOGCOUNTSTransaction())
-        return "Stopped", [1]
+        if self.IsProgramming:
+            return "Stopped", [1]
+        res = self.HandleSerialTransaction(GET_LOGCOUNTSTransaction())
+        if res is None:
+            return None, [1]
+        else:
+            return "Stopped", [1]
 
     def MatchMD5(self, MD5):
         #md5 checking hasn't realised yet

@@ -81,11 +81,12 @@ class BOOTTransaction(MK200Transaction):
         MK200Transaction.__init__(self, "Boot\r\n")
 
     def GetCommandAck(self):
-        res = self.SerialPort.Read(50)
-        if res == "Done\r\n":
-            return 0x55
+        res = self.SerialPort.Read(MAX_CMD_LEN)
+        res = res.split("\n")[1]
+        if res != "Done\r":
+            raise YAPLCProtoError("MK200 transaction error - could not start bootloader!")
         else:
-            return None
+            return 0x55
 
 
 class DownloadTransaction(MK200Transaction):
@@ -170,6 +171,22 @@ class GET_PLCIDTransaction(MK200Transaction):
 class GET_LOGCOUNTSTransaction(MK200Transaction):
     def __init__(self):
         YAPLCTransaction.__init__(self, "GetPlcStatus\r\n")
+
+    def GetCommandAck(self):
+        res = self.SerialPort.Read(MAX_CMD_LEN)
+        res = res.split("\n")[1]
+        if res == "Stopped\r":
+            self.Status = "Stopped"
+            return 0x55
+        elif res == "Running\r":
+            self.Status = "Started"
+            return 0xaa
+        else:
+            self.Status = None
+            raise YAPLCProtoError("MK200 transaction error - controller did not ack order!")
+
+    def ExchangeData(self):
+        return self.Status
 
 
 class GET_LOGMSGTransaction(MK200Transaction):
