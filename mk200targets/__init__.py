@@ -29,7 +29,7 @@ class MKLogik200_target(toolchain_gcc):
 
         additionalobjects = []
 
-        sourceDir = objFileDir + r'/source/src'
+        sourceDir = objFileDir + r'/source/common/src'
         additionalobjects = additionalobjects + [sourceDir + r'/syscalls.c.obj']
 
         runTime = objFile + r'/beremizStm32Port/librunTime.a'

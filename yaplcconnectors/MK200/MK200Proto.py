@@ -44,8 +44,8 @@ class MK200Transaction (YAPLCTransaction):
         self.SerialPort.Write(self.Command)
 
     def GetCommandAck(self):
+        time.sleep(0.05)
         res = self.SerialPort.Read(MAX_CMD_LEN)
-        print res
         return 0x55
 
     def GetData(self):
@@ -81,6 +81,7 @@ class BOOTTransaction(MK200Transaction):
         MK200Transaction.__init__(self, "Boot\r\n")
 
     def GetCommandAck(self):
+        time.sleep(0.5)
         res = self.SerialPort.Read(MAX_CMD_LEN)
         res = res.split("\n")[1]
         if res != "Done\r":
@@ -153,6 +154,48 @@ class DownloadTransaction(MK200Transaction):
         time.sleep(0.5)
 
 
+class GetMD5Transaction(MK200Transaction):
+    def __init__(self):
+        YAPLCTransaction.__init__(self, "GetMd5\r\n")
+        self.Md5 = ""
+
+    def SendCommand(self):
+        self.SerialPort.Write(self.Command)
+        time.sleep(0.5)
+
+    def GetCommandAck(self):
+        res = self.SerialPort.Read(MAX_CMD_LEN)
+        res = res.split("\n")[1]
+        if res[0:4] == "md5:":
+            self.Md5 = res.split(" ")[1].replace("\r", "")
+        else:
+            raise YAPLCProtoError("MK200 transaction error - can't get md5!")
+        return 0x55
+
+    def ExchangeData(self):
+        return self.Md5
+
+
+class SetMd5Transaction (MK200Transaction):
+    def __init__(self, data):
+        YAPLCTransaction.__init__(self, "SetMd5 {}\r\n".format(data))
+        self.Response = ""
+
+    def SendCommand(self):
+        self.SerialPort.Write(self.Command)
+        time.sleep(1.8)
+
+    def GetCommandAck(self):
+        res = self.SerialPort.Read(MAX_CMD_LEN)
+        self.Response = res.split("\n")[1]
+        if self.Response != "Done\r":
+            raise YAPLCProtoError("MK200 transaction error - can't set md5!")
+        return 0x55
+
+    def ExchangeData(self):
+        return self.Response
+
+
 class SET_TRACE_VARIABLETransaction(MK200Transaction):
     def __init__(self, data):
         YAPLCTransaction.__init__(self, "SET_TRACE_VARIABLETransaction\r\n")
@@ -174,7 +217,11 @@ class GET_LOGCOUNTSTransaction(MK200Transaction):
 
     def GetCommandAck(self):
         res = self.SerialPort.Read(MAX_CMD_LEN)
-        res = res.split("\n")[1]
+        initital = res.replace("\r", "\\r")
+        initital = initital.replace("\n", "\\n")
+        res = res.split("\n")
+        if len(res) > 2:
+            res = res[1]
         if res == "Stopped\r":
             self.Status = "Stopped"
             return 0x55

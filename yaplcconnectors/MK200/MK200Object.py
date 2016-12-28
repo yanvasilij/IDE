@@ -86,21 +86,20 @@ class MK200Object():
         return True
 
     def NewPLC(self, md5sum, data, extrafiles):
+        self.IsProgramming = True
         if self.MatchMD5(md5sum) == False:
             res = None;
             failure = None;
-            self.IsProgramming = True
 
-            self.HandleSerialTransaction(SETRTCTransaction())
-            
             self.confnodesroot.logger.write_warning(
                 _("Will now upload firmware to PLC.\nThis may take some time, don't close the program.\n"))
             self.TransactionLock.acquire()
             # Will now boot target
-            res, failure = self._HandleSerialTransaction(BOOTTransaction(), False)
-            time.sleep(0.8)
+            self._HandleSerialTransaction(BOOTTransaction(), False)
+            self._HandleSerialTransaction(SetMd5Transaction(md5sum), False)
+            time.sleep(0.1)
             res, failure = self._HandleSerialTransaction(DownloadTransaction(data, self.confnodesroot), False)
-            time.sleep(0.5)
+            time.sleep(3.0)
             # Close connection
             self.SerialConnection.Close()
             self.IsProgramming = False
@@ -117,6 +116,7 @@ class MK200Object():
                 self.StopPLC();
                 return self.PLCStatus == "Stopped"
         else:
+            self.IsProgramming = False
             self.StopPLC();
             return self.PLCStatus == "Stopped"
 
@@ -130,8 +130,8 @@ class MK200Object():
             return "Stopped", [1]
 
     def MatchMD5(self, MD5):
-        #md5 checking hasn't realised yet
-        return False
+        md5inplc = self.HandleSerialTransaction(GetMD5Transaction())
+        return md5inplc == MD5
 
     def SetTraceVariablesList(self, idxs):
         """
