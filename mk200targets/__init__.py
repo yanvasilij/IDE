@@ -41,8 +41,8 @@ class MKLogik200_target(toolchain_gcc):
 
     def getBuilderCFLAGS(self):
         includePathes = [r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\beremizStm32Port\source\inc']
-        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\..\beremizStm32Port\modbusMasterLib\inc')
-        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\..\FreeModbus\xCpp\include')
+        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\modbusMasterLib\inc')
+        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\FreeModbus\xCpp\include')
         stm32_cflags = self.getSTM32Config("cflags") + includePathes
         return toolchain_gcc.getBuilderCFLAGS(self) + stm32_cflags # + ["-fPIC"]
 
