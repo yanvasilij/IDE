@@ -22,10 +22,13 @@ class ModbusTcpGenerator:
         text = ""
         text += "\tuint8_t "+name+"[] = {"
         p = re.split('\.', self.Variables[name])
-        text += p[0] + ", "
-        text += p[1] + ", "
-        text += p[2] + ", "
-        text += p[3] + "};\n"
+        if len(p) != 4:
+            text += "0,0,0,0};\n"
+        else:
+            text += p[0] + ", "
+            text += p[1] + ", "
+            text += p[2] + ", "
+            text += p[3] + "};\n"
         return text
 
 
