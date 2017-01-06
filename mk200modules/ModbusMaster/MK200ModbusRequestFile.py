@@ -289,7 +289,7 @@ class MK200ModbusRequestFile (CodeFile):
         text += "extern void " + comMbAddRequest + "(RequestType * request);\n\n"
 
         text += self.GenerateVariblePrototypes()
-        text += "#include \"config.h\"\n\n"
+        #text += "#include \"config.h\"\n\n"
 
         text += self.GenerateRequestSturcts()
 
