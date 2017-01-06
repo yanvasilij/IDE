@@ -6,7 +6,7 @@
 """
 import wx
 import os
-from CodeFileTreeNode import CodeFile
+import CodeFileTreeNode
 from editors.CodeFileEditor import CodeEditor
 from editors.CodeFileEditor import CodeFileEditor
 from editors.ConfTreeNodeEditor import ConfTreeNodeEditor
@@ -21,6 +21,10 @@ from MK201DoEditor import MK201DoEditor, NUM_OF_ON_BOARD_DO
 from MK201DoCodeGenerator import MK201DoCodeGenerator
 from MK201FreqInEditor import MK201FreqInEditor, NUM_OF_FRQ_IN
 from MK201FreqInCodeGenerator import MK201FreqInCodeGenerator
+from MK201_XSD import CODEFILE_XSD
+
+CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
+CodeFile = CodeFileTreeNode.CodeFile
 
 DIV_BEGIN = "/" + ("*"*82) + "\n\t\t\t"
 DIV_END = "\n" + ("*"*82) + "/\n"
