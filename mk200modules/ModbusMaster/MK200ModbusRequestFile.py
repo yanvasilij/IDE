@@ -6,9 +6,13 @@
 """
 import wx
 import os
-from CodeFileTreeNode import CodeFile
+import CodeFileTreeNode
+from MK200ModbusMaster_XSD import CODEFILE_XSD
 from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 from MK200ModbusRequestEditor import MK200ModbusRequestEditor
+
+CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
+CodeFile = CodeFileTreeNode.CodeFile
 
 DATALEN_DIC = {"8": "USART_WordLength_8b", "9": "USART_WordLength_9b"}
 PARITY_DIC = {"none": "USART_Parity_No", "even": "USART_Parity_Even", "odd":"USART_Parity_Odd"}
