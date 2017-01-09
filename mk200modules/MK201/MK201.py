@@ -50,6 +50,7 @@ class MK201Editor(CodeEditor):
     def RefreshView(self, scroll_to_highlight=False):
         pass
 
+
 class MK201FileEditor(CodeFileEditor):
 
     CONFNODEEDITOR_TABS = [
@@ -87,6 +88,7 @@ class MK201FileEditor(CodeFileEditor):
 
     def RefreshView(self):
         self.aiEditor.RefreshView()
+
 
 class MK201ModuleFile (CodeFile):
 

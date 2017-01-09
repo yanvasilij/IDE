@@ -84,7 +84,7 @@ class ModbusSlaveFile(CodeFile):
         datas = []
         for var in self.CodeFileVariables(self.CodeFile):
             datas.append({"Name" : var.getname(),
-                          "Type" : var.gettype(),
+                          "Type" : var.gettype().replace(" ", ""),
                           "Initial" : var.getinitial(),
                           "Description" : var.getdesc(),
                           "OnChange"    : var.getonchange(),
