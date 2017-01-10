@@ -19,8 +19,6 @@ INCLUDES = """
 #include "iec_std_lib.h"
 #include "mbport.h"
 
-#define DEBUG
-
 #ifdef DEBUG
 #include "stdio.h"
 #define DEBUG_LOG(x) printf x
