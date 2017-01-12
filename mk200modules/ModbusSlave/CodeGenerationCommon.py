@@ -97,6 +97,7 @@ static UCHAR getRegFrom16Bits (ModbusRegisterType * reg, USHORT * regValue, USHO
     else
     {
         *regValue = *p;
+        return 1;
     }
 }
 
