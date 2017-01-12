@@ -77,6 +77,65 @@ typedef struct
 
 GET_REGISTER_FUNCTION_NAME = "getRegister"
 GET_REGISTER_FUNCTION = """
+
+static UCHAR getRegFrom16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin, USHORT adrToRead)
+{
+    USHORT i;
+    USHORT *p = (USHORT*)reg->data;
+    if (reg->isArray)
+    {
+        for (i = 0; i < reg->arrayLen; i++)
+        {
+            if (adrToRead == adrBegin + i)
+            {
+                *regValue = p[i];
+                return 1;
+            }
+        }
+        return 0;
+    }
+    else
+    {
+        *regValue = *p;
+    }
+}
+
+static UCHAR getRegFrom32Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin, USHORT adrToRead)
+{
+    USHORT i;
+    ULONG *p = (ULONG*)reg->data;
+    if (reg->isArray)
+    {
+        for (i = 0; i < reg->arrayLen; i++)
+        {
+            if (adrToRead == (adrBegin + i*2))
+            {
+                *regValue = p[i] & 0xFFFF;
+                return 1;
+            }
+            else if (adrToRead == (adrBegin + i*2 + 1))
+            {
+                *regValue = (p[i]>>16) & 0xFFFF;
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        if (adrToRead == adrBegin)
+        {
+            *regValue = *p & 0xFFFF;
+            return 1;
+        }
+        else if (adrToRead == (adrBegin + 1))
+        {
+            *regValue = (*p>>16) & 0xFFFF;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /**
  * @brief Get register (holding or input) value by address in register map (working with holdingMap[])
  * @param adr register address
@@ -105,9 +164,20 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
         if ( (adr>=adrBegin) && (adr<adrEnd) )
         {
             DEBUG_LOG(("src - %d <-", (int)*(int*)map[i].data));
-            *regValue = (int)*(int*)map[i].data & 0xFFFF;
-            DEBUG_LOG(("value - %d <-", (int)*regValue));
-            return 1;
+            if (map[i].typeLen == 2)
+            {
+                if (getRegFrom16Bits(&map[i], regValue, adrBegin, adr) == 1)
+                    return 1;
+                else
+                    while (1); /*< should not happen*/
+            }
+            else if (map[i].typeLen == 4)
+            {
+                if (getRegFrom32Bits(&map[i], regValue, adrBegin, adr) == 1)
+                    return 1;
+                else
+                    while (1); /*< should not happen*/
+            }
         }
     }
     DEBUG_LOG(("not found <-"));
