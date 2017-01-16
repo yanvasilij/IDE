@@ -70,13 +70,6 @@ class ModbusSlaveFile(CodeFile):
             self.CreateCodeFileBuffer(False)
             self.OnCTNSave()
 
-
-    def GetVariableLocationTree(self):
-        """
-        Отдает "наверх" список переменных доступных для работы с плагином.
-        """
-        return {}
-
     def GetConfNodeGlobalInstances(self):
         return []
 
