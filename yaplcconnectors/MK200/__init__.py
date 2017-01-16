@@ -39,6 +39,11 @@ def MK200_connector_factory(uri, confnodesroot):
     else:
         lib_ext = ".so"
 
-    YaPySerialLib = os.path.dirname(os.path.realpath(__file__)) + "/../../../YaPySerial/bin/libYaPySerial" + lib_ext
+    YaPySerialLib = os.path.dirname(os.path.realpath(__file__))
+    YaPySerialLib = os.path.dirname(YaPySerialLib)
+    YaPySerialLib = os.path.dirname(YaPySerialLib)
+    YaPySerialLib = os.path.dirname(YaPySerialLib)
+    YaPySerialLib = os.path.join(YaPySerialLib, "YaPySerial", "bin", "libYaPySerial" + lib_ext)
+    print YaPySerialLib
 
     return MK200Object(YaPySerialLib,confnodesroot,comportstr)
