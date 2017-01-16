@@ -188,6 +188,29 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
 
 SET_REGISTER_FUNCTION_NAME = "setRegister"
 SET_REGISTER_FUNCTION = """
+
+static UCHAR setReg16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin, USHORT adrToRead)
+{
+    USHORT i;
+    USHORT *p = (USHORT*)reg->data;
+    if (reg->isArray)
+    {
+        for (i = 0; i < reg->arrayLen; i++)
+        {
+            if (adrToRead == adrBegin + i)
+            {
+                p[i] = *regValue;
+                return 1;
+            }
+        }
+        return 0;
+    }
+    else
+    {
+        *p = *regValue;
+        return 1;
+    }
+}
 /**
  * @brief Set register (holding) value by address in register map (working with holdingMap[])
  * @param adr register address
