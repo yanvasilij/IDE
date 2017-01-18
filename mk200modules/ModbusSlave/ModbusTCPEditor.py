@@ -5,8 +5,10 @@
 @Author Vasilij
 """
 import wx
+from wx.lib.masked.ipaddrctrl import IpAddrCtrl
 
 DESCRIPTION="TCP parameters"
+
 
 
 class TextAndLabel (wx.Panel):
@@ -18,7 +20,7 @@ class TextAndLabel (wx.Panel):
         self.TextCtrl = wx.TextCtrl(self, id=newId)
 
 
-class ModbusTCPEditor (wx.Panel):
+class ModbusTCPEditor (wx.Panel, IpAddrCtrl):
 
     def __init__(self, parent, window, controler):
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
@@ -57,18 +59,20 @@ class ModbusTCPEditor (wx.Panel):
         self.SetSizer(main_sizer)
         self.firstCall = 0
 
+
     def AddTextAndLabel(self, labelText, sizer):
         staticText = wx.StaticText(self, label=labelText)
         sizer.Add(staticText)
         newId = wx.NewId()
-        textCtrl = wx.TextCtrl(self, id=newId)
+        # textCtrl = wx.TextCtrl(self, id=newId)
+        textCtrl = IpAddrCtrl(self, id=newId)
         wx.EVT_TEXT(self, textCtrl.GetId(), self.OnChange)
         sizer.Add(textCtrl)
         return {"Label": staticText, "TextCtrl": textCtrl}
 
     def SetTextCtrl(self, dest, value):
         dest["TextCtrl"].Clear()
-        dest["TextCtrl"].AppendText(value)
+        dest["TextCtrl"].SetValue(value)
 
     def OnChange(self, event):
         valuesOnFrame = self.GetData()
@@ -94,10 +98,11 @@ class ModbusTCPEditor (wx.Panel):
             data["Options"] = "Enabled"
         else:
             data["Options"] = "Disabled"
-        data["Ipaddr"] = self.IpAddr["TextCtrl"].GetValue()
-        data["Submask"] = self.Subnetmask["TextCtrl"].GetValue()
-        data["Gateway"] = self.Gateway["TextCtrl"].GetValue()
-        data["Dns"] = self.Dns["TextCtrl"].GetValue()
+        data["Ipaddr"] = self.IpAddr["TextCtrl"].GetAddress()
+        data["Submask"] = self.Subnetmask["TextCtrl"].GetAddress()
+        data["Gateway"] = self.Gateway["TextCtrl"].GetAddress()
+        data["Dns"] = self.Dns["TextCtrl"].GetAddress()
+
         return [data]
 
     def SetData(self, value):
