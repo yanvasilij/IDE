@@ -19,6 +19,8 @@ INCLUDES = """
 #include "iec_std_lib.h"
 #include "mbport.h"
 
+#define DEBUG
+
 #ifdef DEBUG
 #include "stdio.h"
 #define DEBUG_LOG(x) printf x
@@ -151,33 +153,48 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
     for (i = 0; i < numOfRegisters; i++)
     {
         adrBegin = map[i].adr;
+        DEBUG_LOG((" map[%d].adrBegin = %d ", (int)i, (int)adrBegin));
         if (map[i].isArray)
         {
+            DEBUG_LOG((" map[%d].isArray - %d ", (int)i, (int)adrBegin));
             len = map[i].arrayLen * map[i].typeLen / 2;
-            if (len%2) len++;
+            //if (len%2) len++;
         }
         else
         {
             len = map[i].typeLen / 2;
-            if (len%2) len++;
+            //if (len%2) len++;
         }
+        DEBUG_LOG((" map[%d].typeLen - %d ", (int)i, (int)len));
+        DEBUG_LOG((" len - %d ", (int)len));
         adrEnd = adrBegin + len;
+        DEBUG_LOG((" adrEnd - %d ", (int)adrEnd));
         if ( (adr>=adrBegin) && (adr<adrEnd) )
         {
             DEBUG_LOG(("src - %d <-", (int)*(int*)map[i].data));
             if (map[i].typeLen == 2)
             {
                 if (getRegFrom16Bits(&map[i], regValue, adrBegin, adr) == 1)
+                {
                     return 1;
+                }
                 else
+                {
+                    DEBUG_LOG((" ERROR: getRegFrom16Bits() = 0 !!! "));
                     while (1); /*< should not happen*/
+                }
             }
             else if (map[i].typeLen == 4)
             {
                 if (getRegFrom32Bits(&map[i], regValue, adrBegin, adr) == 1)
+                {
                     return 1;
+                }
                 else
+                {
+                    DEBUG_LOG((" ERROR: getRegFrom32Bits() = 0 !!! "));
                     while (1); /*< should not happen*/
+                }
             }
         }
     }
@@ -189,7 +206,8 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
 SET_REGISTER_FUNCTION_NAME = "setRegister"
 SET_REGISTER_FUNCTION = """
 
-static UCHAR setReg16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin, USHORT adrToRead)
+static UCHAR setReg16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin,
+    USHORT adrToWrite)
 {
     USHORT i;
     USHORT *p = (USHORT*)reg->data;
@@ -197,7 +215,7 @@ static UCHAR setReg16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT a
     {
         for (i = 0; i < reg->arrayLen; i++)
         {
-            if (adrToRead == adrBegin + i)
+            if (adrToWrite == adrBegin + i)
             {
                 p[i] = *regValue;
                 return 1;
@@ -211,6 +229,48 @@ static UCHAR setReg16Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT a
         return 1;
     }
 }
+
+static UCHAR setReg32Bits (ModbusRegisterType * reg, USHORT * regValue, USHORT adrBegin,
+    USHORT adrToWrite)
+{
+    USHORT i;
+    ULONG *p = (ULONG*)reg->data;
+    if (reg->isArray)
+    {
+        for (i = 0; i < reg->arrayLen; i++)
+        {
+            if (adrToWrite == (adrBegin + i*2))
+            {
+                p[i] &= ~(0xFFFF);
+                p[i] |= *regValue;
+                return 1;
+            }
+            else if (adrToWrite == (adrBegin + i*2 + 1))
+            {
+                p[i] &= ~(0xFFFF<<16);
+                p[i] |= (*regValue<<16);
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        if (adrToWrite == adrBegin)
+        {
+            *p &= ~(0xFFFF);
+            *p |= *regValue;
+            return 1;
+        }
+        else if (adrToWrite == (adrBegin + 1))
+        {
+            *p &= ~(0xFFFF<<16);
+            *(int*)p |= (*regValue<<16);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /**
  * @brief Set register (holding) value by address in register map (working with holdingMap[])
  * @param adr register address
@@ -221,28 +281,52 @@ static UCHAR """+SET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
 {
     USHORT adrBegin, adrEnd;
     ULONG len, i;
+    DEBUG_LOG(("->setRegister() "));
     for (i = 0; i < numOfRegisters; i++)
     {
         adrBegin = map[i].adr;
         if (map[i].isArray)
         {
             len = map[i].arrayLen * map[i].typeLen / 2;
-            if (len%2) len++;
+            //if (len%2) len++;
         }
         else
         {
             len = map[i].typeLen / 2;
-            if (len%2) len++;
+            //if (len%2) len++;
         }
         adrEnd = adrBegin + len;
         if ( (adr>=adrBegin) && (adr<adrEnd) )
         {
-            USHORT * data;
-            data = map[i].data;
-            data[adr-adrBegin] = *regValue;
-            return 1;
+            if (map[i].typeLen == 2)
+            {
+                if (setReg16Bits (&map[i], regValue, adrBegin, adr) == 1)
+                {
+                    DEBUG_LOG((" <- "));
+                    return 1;
+                }
+                else
+                {
+                    DEBUG_LOG((" ERROR: setReg16Bits() = 0 !!! "));
+                    while (1); /*< should not happen */
+                }
+            }
+            if (map[i].typeLen == 4)
+            {
+                if (setReg32Bits (&map[i], regValue, adrBegin, adr) == 1)
+                {
+                    DEBUG_LOG((" <- "));
+                    return 1;
+                }
+                else
+                {
+                    DEBUG_LOG((" ERROR: setReg32Bits() = 0 !!! "));
+                    while (1); /*< should not happen */
+                }
+            }
         }
     }
+    DEBUG_LOG((" return 0 <- "));
     return 0;
 }
 """
