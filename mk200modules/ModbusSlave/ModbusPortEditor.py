@@ -13,7 +13,7 @@ from controls.VariablePanel import VARIABLE_NAME_SUFFIX_MODEL
 
 DESCRIPTION = "Modbus slave RTU port"
 HEADER_TEXT = "    RTU ports"
-COLUMNS = ["Name", "Port", "Baudrate", "Data bits", "Parity", "Stop bits"]
+COLUMNS = ["Name", "Port", "Address", "Baudrate", "Data bits", "Parity", "Stop bits"]
 
 RS485_PORTS = ["COM1", "COM2", "COM3"]
 RS485_PORTS_STR = ','.join(RS485_PORTS)
@@ -55,6 +55,8 @@ class PortEditorTable (ModbusSalveTable):
                 elif colname == "Stop bits":
                     editor = wx.grid.GridCellChoiceEditor()
                     editor.SetParameters(STOPBITS_STR)
+                elif colname == "Address":
+                    editor = wx.grid.GridCellTextEditor()
                 else:
                     grid.SetReadOnly(row, col, True)
 
@@ -63,6 +65,29 @@ class PortEditorTable (ModbusSalveTable):
 
                 grid.SetCellBackgroundColour(row, col, wx.WHITE)
             self.ResizeRow(grid, row)
+        self.CheckPort()
+        # self.CheckPort()
+
+    def CheckPort(self):
+        curPorts = self.data
+        errorStatus = 0
+        erroCheck = False
+        for variables1 in curPorts:
+            errorStatus = 0
+            for variables2 in curPorts:
+                if variables1["Port"] == variables2["Port"]:
+                    errorStatus += 1
+                if errorStatus >= 2:
+                    erroCheck = True
+        if erroCheck:
+            print("COM ERROR!" * 10)
+            message = _("lol")
+            dialog = wx.MessageDialog(self.Parent, message, _("Error"))
+            dialog.ShowModal()
+            dialog.Destroy()
+
+
+
 
 
 class ModbusPortEditor (ModbusSlaveRegEditor):
@@ -71,6 +96,7 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
         ModbusSlaveRegEditor.__init__(self, parent, window, controler, HEADER_TEXT, DESCRIPTION, COLUMNS)
         self.VariablesDefaultValue = {
             "Name": "Port0",
+            "Address": "1",
             "Baudrate": "115200",
             "Data bits": "8",
             "Type": "BOOL",
@@ -81,10 +107,14 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
         """ handlers for adding variable """
 
         self.Table = PortEditorTable(self, COLUMNS)
+        def hui():
+            print "hello!"
+        # self.Table.CheckPort = hui
         self.ColSizes = [20, 150] + [100]*(len(self.VariablesDefaultValue)-1)
         self.VariablesGrid.SetTable(self.Table)
 
         def _AddVariable(new_row):
+            row_all = self.Table.data
             if new_row > 0:
                 row_content = self.Table.data[new_row - 1].copy()
                 result = VARIABLE_NAME_SUFFIX_MODEL.search(row_content["Name"])
@@ -100,13 +130,26 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
                     start_idx = 0
                 row_content["Name"] = self.Controler.GenerateNewName(
                     name + "%d", start_idx)
+
+                comNum = 1
+                comName = "COM" + str(comNum)
+                curPorts = []
+                for variable in row_all:
+                    curPorts.append(variable["Port"])
+                for port in sorted(curPorts):
+                    if comName == port:
+                        comNum += 1
+                        comName = "COM" + str(comNum)
+                row_content["Port"] = comName
             else:
                 row_content = self.VariablesDefaultValue.copy()
-            self.Table.InsertRow(new_row, row_content)
-            self.RefreshModel()
-            self.RefreshView()
-            return new_row
+            if len(row_all) < 3:
+                self.Table.InsertRow(new_row, row_content)
+                self.RefreshModel()
+                self.RefreshView()
+                return new_row
         setattr(self.VariablesGrid, "_AddRow", _AddVariable)
+
 
     def RefreshView(self):
         controlerVars = self.Controler.GetVariables()
@@ -126,6 +169,7 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
         self.Table.SetData(tableVars)
         self.Table.ResetView(self.VariablesGrid)
         self.VariablesGrid.RefreshButtons()
+
 
     def RefreshModel(self):
         controllerVariables = self.Controler.GetVariables()
