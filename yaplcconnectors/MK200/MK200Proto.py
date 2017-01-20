@@ -158,18 +158,22 @@ class GetMD5Transaction(MK200Transaction):
     def __init__(self):
         YAPLCTransaction.__init__(self, "GetMd5\r\n")
         self.Md5 = ""
+        self.NumOfAttempts = 10
 
     def SendCommand(self):
         self.SerialPort.Write(self.Command)
         time.sleep(0.5)
 
     def GetCommandAck(self):
-        res = self.SerialPort.Read(MAX_CMD_LEN)
-        res = res.split("\n")[1]
-        if res[0:4] == "md5:":
-            self.Md5 = res.split(" ")[1].replace("\r", "")
-        else:
-            raise YAPLCProtoError("MK200 transaction error - can't get md5!")
+        for i in range(0, self.NumOfAttempts):
+            res = self.SerialPort.Read(MAX_CMD_LEN)
+            res = res.split("\n")[1]
+            if res[0:4] == "md5:":
+                self.Md5 = res.split(" ")[1].replace("\r", "")
+                break
+            else:
+                if i == self.NumOfAttempts:
+                    raise YAPLCProtoError("MK200 transaction error - can't get md5!")
         return 0x55
 
     def ExchangeData(self):
