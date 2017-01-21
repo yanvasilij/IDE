@@ -107,9 +107,6 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
         """ handlers for adding variable """
 
         self.Table = PortEditorTable(self, COLUMNS)
-        def hui():
-            print "hello!"
-        # self.Table.CheckPort = hui
         self.ColSizes = [20, 150] + [100]*(len(self.VariablesDefaultValue)-1)
         self.VariablesGrid.SetTable(self.Table)
 
@@ -159,7 +156,8 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
             tableVar = {}
             tableVar["Name"] = var["Name"]
             tableVar["Port"] = var["Options"]
-            tableVar["Baudrate"] = var["Address"]
+            tableVar["Address"] = var["Address"]
+            tableVar["Baudrate"] = var["Baudrate"]
             tableVar["Data bits"] = var["Len"]
             tableVar["Parity"] = var["Parity"]
             tableVar["Stop bits"] = var["Id"]
@@ -179,7 +177,8 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
             controlerVar = {}
             controlerVar["Name"] = var["Name"]
             controlerVar["Options"] = var["Port"]
-            controlerVar["Address"] = var["Baudrate"]
+            controlerVar["Address"] = var["Address"]
+            controlerVar["Baudrate"] = var["Baudrate"]
             controlerVar["Len"] = var["Data bits"]
             controlerVar["Parity"] = var["Parity"]
             controlerVar["Id"] = var["Stop bits"]

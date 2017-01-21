@@ -83,6 +83,7 @@ class ModbusSlaveFile(CodeFile):
                           "OnChange"    : var.getonchange(),
                           "Options"     : var.getopts(),
                           "Address" : var.getaddress(),
+                          "Baudrate" : var.getbaudrate(),
                           "Len": var.getlen(),
                           "Id": var.getdevid(),
                           "Parity": var.gettxtype(),
@@ -111,6 +112,7 @@ class ModbusSlaveFile(CodeFile):
             setVariable(variable, "setonchange", var, "OnChange")
             setVariable(variable, "setopts", var, "Options")
             setVariable(variable, "setaddress", var, "Address")
+            setVariable(variable, "setbaudrate", var, "Baudrate")
             setVariable(variable, "setlen", var, "Len")
             setVariable(variable, "settxtype", var, "Parity")
             setVariable(variable, "setdevid", var, "Id")

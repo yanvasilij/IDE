@@ -79,12 +79,12 @@ class CodeGenerator:
         ports = [i for i in ports if i["Description"] == MODBUS_PORT_DESC]
         text = ""
         for port in ports:
-            adr = "1"
+            adr = port["Address"]
             comPort = port["Options"]
             dataBits = port["Len"]
             parity = PARITY_INIT_VALUE[port["Parity"]]
             stopBits = port["Id"]
-            baudrate = port["Address"]
+            baudrate = port["Baudrate"]
             text += "\t" + INIT_COM_PORT[comPort] + "("
             text += INPUT_REGISTER_CALL_BACK_NAME + ","
             text += HOLDING_REGISTER_CALL_BACK_NAME + ","

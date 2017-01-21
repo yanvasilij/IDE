@@ -35,6 +35,7 @@ CODEFILE_XSD = """<?xml version="1.0" encoding="ISO-8859-1" ?>
                   <xsd:attribute name="address" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="len" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="devid" type="xsd:string" use="optional" default=""/>
+                  <xsd:attribute name="baudrate" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="txtype" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="ipaddr" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="submask" type="xsd:string" use="optional" default=""/>
