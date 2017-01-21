@@ -8,6 +8,7 @@
 # @date 2016-01-26
 
 import wx
+from copy import deepcopy
 from ModbusSlaveEditorBase import ModbusSlaveRegEditor, ModbusSalveTable
 from controls.VariablePanel import VARIABLE_NAME_SUFFIX_MODEL
 
@@ -56,7 +57,7 @@ class PortEditorTable (ModbusSalveTable):
                     editor = wx.grid.GridCellChoiceEditor()
                     editor.SetParameters(STOPBITS_STR)
                 elif colname == "Address":
-                    editor = wx.grid.GridCellTextEditor()
+                    editor = wx.grid.GridCellNumberEditor()
                 else:
                     grid.SetReadOnly(row, col, True)
 
@@ -109,6 +110,7 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
         self.Table = PortEditorTable(self, COLUMNS)
         self.ColSizes = [20, 150] + [100]*(len(self.VariablesDefaultValue)-1)
         self.VariablesGrid.SetTable(self.Table)
+        newParamsRS485 = deepcopy(RS485_PORTS)
 
         def _AddVariable(new_row):
             row_all = self.Table.data
@@ -128,6 +130,7 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
                 row_content["Name"] = self.Controler.GenerateNewName(
                     name + "%d", start_idx)
 
+                # newParams = deepcopy(RS485_PORTS)
                 comNum = 1
                 comName = "COM" + str(comNum)
                 curPorts = []
@@ -137,6 +140,11 @@ class ModbusPortEditor (ModbusSlaveRegEditor):
                     if comName == port:
                         comNum += 1
                         comName = "COM" + str(comNum)
+                    # newParamsRS485 = deepcopy(RS485_PORTS)
+                    # for widget in row_all:
+                    #     newParamsRS485.remove(widget["Port"])
+                    # editor = wx.grid.GridCellChoiceEditor()
+                    # newParamsRS485 = ','.join(newParamsRS485)
                 row_content["Port"] = comName
             else:
                 row_content = self.VariablesDefaultValue.copy()
