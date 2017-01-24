@@ -52,6 +52,7 @@ int WaitDebug_pipe_fd;
 int WaitPython_pipe_fd;
 int Debug_pipe_fd;
 int Python_pipe_fd;
+const unsigned char ucMACAddress[ 6 ] = { 0x1E, 0x30, 0x6C, 0xA2, 0x45, 0x44 };
 /**********************************************************************************
 *				funs
 **********************************************************************************/
