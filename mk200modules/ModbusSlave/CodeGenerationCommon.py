@@ -26,9 +26,12 @@ INCLUDES = """
 #define DEBUG_LOG(x)
 #endif
 
+#define ERROR_LOG(x) printf x; setErrLed(1);  while (1);
+
 """
 
 EXTERNS = """
+extern void setErrLed (unsigned char enable);
 extern void com1MbSlaveInit ( void * eMBRegInputCB, void * eMBRegHoldingCB,
 		void * eMBRegCoilsCB, void * eMBRegDiscreteCB,
 		USHORT adr, ULONG baudrate, UCHAR dataBits, eMBParity parity, UCHAR stopBits);
@@ -178,8 +181,7 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
                 }
                 else
                 {
-                    DEBUG_LOG((" ERROR: getRegFrom16Bits() = 0 !!! "));
-                    while (1); /*< should not happen*/
+                    ERROR_LOG((" ERROR: getRegFrom16Bits() = 0 !!! "));
                 }
             }
             else if (map[i].typeLen == 4)
@@ -190,8 +192,7 @@ static UCHAR """+GET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
                 }
                 else
                 {
-                    DEBUG_LOG((" ERROR: getRegFrom32Bits() = 0 !!! "));
-                    while (1); /*< should not happen*/
+                    ERROR_LOG((" ERROR: getRegFrom32Bits() = 0 !!! "));
                 }
             }
         }
@@ -305,8 +306,7 @@ static UCHAR """+SET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
                 }
                 else
                 {
-                    DEBUG_LOG((" ERROR: setReg16Bits() = 0 !!! "));
-                    while (1); /*< should not happen */
+                    ERROR_LOG((" ERROR: setReg16Bits() = 0 !!! "));
                 }
             }
             if (map[i].typeLen == 4)
@@ -318,8 +318,7 @@ static UCHAR """+SET_REGISTER_FUNCTION_NAME+"""(USHORT adr, USHORT * regValue, M
                 }
                 else
                 {
-                    DEBUG_LOG((" ERROR: setReg32Bits() = 0 !!! "));
-                    while (1); /*< should not happen */
+                    ERROR_LOG((" ERROR: setReg32Bits() = 0 !!! "));
                 }
             }
         }
