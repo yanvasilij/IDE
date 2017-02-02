@@ -30,19 +30,19 @@ class MKLogik200_target(toolchain_gcc):
         additionalobjects = []
 
         sourceDir = objFileDir + r'/source/common/src'
-        additionalobjects = additionalobjects + [sourceDir + r'/syscalls.c.obj']
+        additionalobjects = additionalobjects + ["\"" + sourceDir + r'/syscalls.c.obj' + "\""]
 
-        runTime = objFile + r'/beremizStm32Port/librunTime.a'
+        runTime = "\"" + objFile + r'/beremizStm32Port/librunTime.a' + "\""
         additionalobjects = additionalobjects + [runTime]
 
         stm32_ldflags = self.getSTM32Config("ldflags")
-        ldscript = ['-T'] + [objFile + r'/beremizStm32Port/linkScript/STM32F407ZG_FLASH.ld'] #[os.path.dirname(os.path.realpath(__file__)) + r'/port/STM32F407ZG_FLASH.ld']
+        ldscript = ['-T'] + ["\"" + objFile + r'/beremizStm32Port/linkScript/STM32F407ZG_FLASH.ld' + "\""] #[os.path.dirname(os.path.realpath(__file__)) + r'/port/STM32F407ZG_FLASH.ld']
         return additionalobjects + toolchain_gcc.getBuilderLDFLAGS(self) + stm32_ldflags + ldscript# + ["-shared"]
 
     def getBuilderCFLAGS(self):
-        includePathes = [r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\beremizStm32Port\source\inc']
-        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\modbusMasterLib\inc')
-        includePathes.append(r'-I ' + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\FreeModbus\xCpp\include')
+        includePathes = [r'-I ' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\beremizStm32Port\source\inc' + "\""]
+        includePathes.append(r'-I' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\modbusMasterLib\inc' + "\"" )
+        includePathes.append(r'-I' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\FreeModbus\xCpp\include' + "\"")
         stm32_cflags = self.getSTM32Config("cflags") + includePathes
         return toolchain_gcc.getBuilderCFLAGS(self) + stm32_cflags # + ["-fPIC"]
 
