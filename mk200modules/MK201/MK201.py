@@ -21,6 +21,7 @@ from MK201DoEditor import MK201DoEditor, NUM_OF_ON_BOARD_DO
 from MK201DoCodeGenerator import MK201DoCodeGenerator
 from MK201FreqInEditor import MK201FreqInEditor, NUM_OF_FRQ_IN
 from MK201FreqInCodeGenerator import MK201FreqInCodeGenerator
+from MK201RTCCodeGenerator import MK201RTCCodeGenerator
 from MK201_XSD import CODEFILE_XSD
 
 CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
@@ -111,6 +112,20 @@ class MK201ModuleFile (CodeFile):
                 'size':  size})
         return variableTree
 
+    def GetRTCVariableLocationTree(self, treeName, type, location, size):
+        variableTree = {"name": treeName, "type": LOCATION_GROUP, "location": "0", "children": []}
+        timeType = ["Milliseconds", "Second", "Minutes", "Hour", "Date", "Month", "Year"]
+        for i in range(0, 7):
+            variableTree["children"].append({
+                'children':[],
+                'var_name': timeType[i],
+                'IEC_type': type,
+                'name': timeType[i],
+                'description': '',
+                'type': LOCATION_VAR_MEMORY,
+                'location': location+'.{}'.format(i),
+                'size':  size})
+        return variableTree
 
     def GetVariableLocationTree(self):
         """
@@ -132,10 +147,15 @@ class MK201ModuleFile (CodeFile):
                 "location": '%QD'+iecChannel+'.2',
                 "children": frqInChildren}
 
+        rtcValuesVars = self.GetRTCVariableLocationTree("RTC value", u'UINT', '%QW'+iecChannel+'.5', 'W')
+        rtcSetVars =  self.GetRTCVariableLocationTree("RTC set", u'UINT', '%QW'+iecChannel+'.6', 'W')
+
         digitalInputs = self.GetIoVariableLocationTree("Digital inputs", u'BOOL', '%QX'+iecChannel+'.3', 'X', NUM_OF_ON_BOARD_DI)
         digitalOutputs = self.GetIoVariableLocationTree("Digital outputs", u'BOOL', '%QX'+iecChannel+'.4', 'X', NUM_OF_ON_BOARD_DO)
 
-        children = [analogInputs, analogOutputs, freqInputs, digitalInputs, digitalOutputs]
+
+
+        children = [analogInputs, analogOutputs, freqInputs, digitalInputs, digitalOutputs, rtcValuesVars, rtcSetVars]
         return {"name": self.BaseParams.getName(),
                 "type": LOCATION_CONFNODE,
                 "location": self.GetFullIEC_Channel(),
@@ -150,9 +170,9 @@ class MK201ModuleFile (CodeFile):
             datas.append({"Name" : var.getname(),
                           "Type" : var.gettype(),
                           "Initial" : var.getinitial(),
-                          "Description" : var.getdesc(),
-                          "OnChange"    : var.getonchange(),
-                          "Options"     : var.getopts(),
+                          "Description": var.getdesc(),
+                          "OnChange": var.getonchange(),
+                          "Options": var.getopts(),
                           "Address" : var.getaddress(),
                           "Len" : var.getlen(),
                           })
@@ -189,12 +209,19 @@ class MK201ModuleFile (CodeFile):
         self.FreqInCodeGenerator = MK201FreqInCodeGenerator(self)
         self.DiCodeGenerator = MK201DiCodeGenerator(self)
         self.DoCodeGenerator = MK201DoCodeGenerator(self)
+        self.RTCCodeGenerator = MK201RTCCodeGenerator(self)
 
         text += self.AiCodeGenerator.GenerateVars()
         text += self.AoCodeGenerator.GenerateVars()
         text += self.FreqInCodeGenerator.GenerateVars()
         text += self.DiCodeGenerator.GenerateVars()
         text += self.DoCodeGenerator.GenerateVars()
+
+        # text += self.RTCCodeGenerator.GenerateHourVars()
+        # text += self.RTCCodeGenerator.GenerateMinuteVars()
+        # RTC
+        text += self.RTCCodeGenerator.GenerateRTCValueVars()
+        text += self.RTCCodeGenerator.GenerateRTCSetVars()
 
         text += DIV_BEGIN + "Publish and retrive" + DIV_END
         text += "int __init_%s(int argc,char **argv)\n{\n"%location_str
@@ -203,6 +230,7 @@ class MK201ModuleFile (CodeFile):
         text += self.FreqInCodeGenerator.GenerateInit()
         text += self.DiCodeGenerator.GenerateInit()
         text += self.DoCodeGenerator.GenerateInit()
+        # text += self.RTCCodeGenerator.GenerateInitRTCSet()
         text += "  return 0;\n}\n\n"
 
         text += "void __cleanup_%s(void)\n{\n"%location_str
