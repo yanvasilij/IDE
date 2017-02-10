@@ -17,6 +17,7 @@ DATA_BITS = ("8", "9")
 PARITY = ("none", "even", "odd")
 STOP_BITS = ("1", "2")
 BAUDRATES = ("115200", "57600", "56000", "38400", "28800", "19200", "14400", "9600", "4800", "2400")
+DEFAULT_CONFIG = {"COM PORT": "COM1", "BAUD": "115200", "DATA BITS": "8", "PARITY": "none", "STOPBITS": "1"}
 
 HEIGHT = 20
 
@@ -53,7 +54,7 @@ class MBPortConfigPanel(wx.Panel):
                 "Transfer method" : "",
                 "Period" : "",
                 "Description": DESCRIPTION,
-                "Modbus type":"COM1"})
+                "Modbus type": DEFAULT_CONFIG["COM PORT"]})
         self.DefaultConfig.append ({
                 "Name" : "Baudrate",
                 "Address" : "",
@@ -63,7 +64,7 @@ class MBPortConfigPanel(wx.Panel):
                 "Transfer method" : "",
                 "Period" : "",
                 "Description": DESCRIPTION,
-                "Modbus type":"115200"})
+                "Modbus type": DEFAULT_CONFIG["BAUD"]})
         self.DefaultConfig.append ({
                 "Name" : "Data bits",
                 "Address" : "",
@@ -73,7 +74,7 @@ class MBPortConfigPanel(wx.Panel):
                 "Transfer method" : "",
                 "Period" : "",
                 "Description": DESCRIPTION,
-                "Modbus type":"8"})
+                "Modbus type": DEFAULT_CONFIG["DATA BITS"]})
         self.DefaultConfig.append ({
                 "Name" : "Parity",
                 "Address" : "",
@@ -83,7 +84,7 @@ class MBPortConfigPanel(wx.Panel):
                 "Transfer method" : "",
                 "Period" : "",
                 "Description": DESCRIPTION,
-                "Modbus type": "none"})
+                "Modbus type": DEFAULT_CONFIG["PARITY"]})
         self.DefaultConfig.append ({
                 "Name" : "Stopbits",
                 "Address" : "",
@@ -93,7 +94,7 @@ class MBPortConfigPanel(wx.Panel):
                 "Transfer method" : "",
                 "Period" : "",
                 "Description": DESCRIPTION,
-                "Modbus type": "1"})
+                "Modbus type": DEFAULT_CONFIG["STOPBITS"]})
 
         self.title = wx.StaticText(self, label="Port configuration")
         font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.BOLD)
