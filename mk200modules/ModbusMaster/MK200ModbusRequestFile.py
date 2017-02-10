@@ -10,6 +10,8 @@ import CodeFileTreeNode
 from MK200ModbusMaster_XSD import CODEFILE_XSD
 from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 from MK200ModbusRequestEditor import MK200ModbusRequestEditor
+from MBPortConfigPanel import DEFAULT_CONFIG
+import copy
 
 CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
 CodeFile = CodeFileTreeNode.CodeFile
@@ -142,6 +144,11 @@ class MK200ModbusRequestFile (CodeFile):
     def GetPortConfig(self):
         configVariables = [i for i in self.GetVariables() if i["Description"] == "Port configuration"]
         config = {}
+        if len(configVariables) != 5:
+            config = copy.copy(DEFAULT_CONFIG)
+            config["COM PORT"] = int(config["COM PORT"][-1])
+            config["PARITY"] = PARITY_DIC[config["PARITY"]]
+            return config
         for variable in configVariables:
             optValue = variable["Modbus type"]
             if variable["Name"] == "Port selection":
@@ -248,10 +255,11 @@ class MK200ModbusRequestFile (CodeFile):
             requestStruct += "\t" + REQUEST_TYPES[request["Modbus type"]] + ",\n"
             requestStruct += "\tMBRequestSuccesfulyDone,\n"
             requestStruct += "\tMBNoError,\n"
-            requestStruct += "\t0,\n"
             if request["Transfer method"] == "Periodic":
                 requestStruct += "\t1,\n"
+                requestStruct += "\t1,\n"
             else:
+                requestStruct += "\t0,\n"
                 requestStruct += "\t0,\n"
             requestStruct += "\t100,\n"
             requestStruct += "\t{},\n".format(request["Device ID"])
