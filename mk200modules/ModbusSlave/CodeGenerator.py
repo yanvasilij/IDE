@@ -99,12 +99,12 @@ class CodeGenerator:
 
     def GeneretaInit(self):
         text = ""
-        #text += self.HoldingGenerator.GenerateInit()
-        #text += self.InputGenerator.GenerateInit()
-        #text += self.CoilGenerator.GenerateInit()
-        #text += self.DiscGenerator.GenerateInit()
-        #text += self.MbTcpGenerator.GenerateInit()
-        #text += self.GeneratePortInit()
-        text +=  "\treturn 0;\n"
+        text += self.HoldingGenerator.GenerateInit()
+        text += self.InputGenerator.GenerateInit()
+        text += self.CoilGenerator.GenerateInit()
+        text += self.DiscGenerator.GenerateInit()
+        text += self.MbTcpGenerator.GenerateInit()
+        text += self.GeneratePortInit()
+        text += "\treturn 0;\n"
         return text
 
