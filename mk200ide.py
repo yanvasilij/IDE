@@ -22,7 +22,7 @@ features.catalog = [
     ('svgui', _('SVGUI'), _('Experimental web based HMI'), 'svgui.SVGUI'),
     ('MK200ModbusSlave', _('MK200 Modbus slave'), _('Plugin for modbus slave'), 'mk200modules.ModbusSlave.ModbusSlaveFile'),
     ('MKLogic201', _('MKLogic 201'), _('Plugin for MK201'), 'mk200modules.MK201.MK201ModuleFile'),
-    ('MK200ModubsRequest', _('MK200 Modbus master request'), _('Plugin for MK201'), 'mk200modules.ModbusMaster.MK200ModbusRequestFile') ]
+    ('MK200ModubsRequest', _('MK200 Modbus master request'), _('Plugin for MK201'), 'mk200modules.ModbusMaster.MK200ModbusRequestFile')]
 
 from mk200targets import mk200targets
 targets.targets = {}
