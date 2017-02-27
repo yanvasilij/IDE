@@ -204,6 +204,8 @@ class MK201ModuleFile (CodeFile):
         location_str = "_".join(map(str, current_location))
         text = ""
 
+        # text += "__UINT32_TYPE__ getMilliseconsd(void); // init RTC function for milliseconds \n"
+
         self.AiCodeGenerator = MK201AiCodeGenerator(self)
         self.AoCodeGenerator = MK201AoCodeGenerator(self)
         self.FreqInCodeGenerator = MK201FreqInCodeGenerator(self)
@@ -230,14 +232,13 @@ class MK201ModuleFile (CodeFile):
         text += self.FreqInCodeGenerator.GenerateInit()
         text += self.DiCodeGenerator.GenerateInit()
         text += self.DoCodeGenerator.GenerateInit()
-        # text += self.RTCCodeGenerator.GenerateInitRTCSet()
         text += "  return 0;\n}\n\n"
 
         text += "void __cleanup_%s(void)\n{\n"%location_str
         text += "\n}\n\n"
 
         text += "void __retrieve_%s(void)\n{\n"%location_str
-        text += "   ;\n"
+        text += self.RTCCodeGenerator.GenerateRetrieveMillisec()
         text += "\n}\n\n"
 
         text += "void __publish_%s(void)\n{\n"%location_str
