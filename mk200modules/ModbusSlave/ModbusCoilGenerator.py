@@ -67,7 +67,7 @@ class ModbusCoilGenerator:
         numOfVars = len(variables)
         text = ""
         text += "#define COIL_ENTRY_NUMS {} /**< @brief num of entries in coil map */\n".format(numOfVars)
-        text += "static ModbusDiscreteType {}[INPUTS_ENTRY_NUMS];\n\n".format(COIL_MAP)
+        text += "static ModbusDiscreteType {}[COIL_ENTRY_NUMS];\n\n".format(COIL_MAP)
         text += "/**\n * @brief initialization modbus coil map\n */"
         text += "static void {} (void)\n".format(INIT_FUNCTION_NAME)
         text += "{\n"
