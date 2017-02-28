@@ -45,12 +45,13 @@ class MK201RTCCodeGenerator(MK201IOCodeGenerator):
         text = DIV_BEGIN + "RTC set" + DIV_END
         text += "__UINT16_TYPE__ setTimeArray[3];\n"
         text += "__UINT16_TYPE__ setDateArray[3];\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_1 = &setTimeArray[0]; // RTC second\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_2 = &setTimeArray[1]; // RTC minutes\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_3 = &setTimeArray[2]; // RTC hours\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_4 = &setDateArray[0]; // RTC Date\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_5 = &setDateArray[1]; // RTC Month\n"
-        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_6 = &setDateArray[2]; // RTC Year\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_0; // RTC set millisecond \n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_1 = &setTimeArray[0]; // RTC set second\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_2 = &setTimeArray[1]; // RTC set minutes\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_3 = &setTimeArray[2]; // RTC set hours\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_4 = &setDateArray[0]; // RTC set Date\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_5 = &setDateArray[1]; // RTC set Month\n"
+        text += "__UINT16_TYPE__ *" + "__QW" + iecChannel + "_6_6 = &setDateArray[2]; // RTC set Year\n"
         return text
 
     def GenerateRetrieveMillisec(self):
