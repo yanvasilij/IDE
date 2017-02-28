@@ -1,7 +1,7 @@
       <xsd:element name="MKLogik200">
         <xsd:complexType>
           <xsd:attribute name="Compiler" type="xsd:string" use="optional" default="../gcc-arm-none-eabi_4.9.3_win32/bin/arm-none-eabi-gcc"/>
-          <xsd:attribute name="CFLAGS" type="xsd:string" use="optional" default="-mcpu=cortex-m3 -ffunction-sections -mlittle-endian -mthumb -g -D STM32F407xx -D USE_HAL_DRIVER"/>
+          <xsd:attribute name="CFLAGS" type="xsd:string" use="optional" default="-mcpu=cortex-m3 -fstack-usage -ffunction-sections -mlittle-endian -mthumb -g -D STM32F407xx -D USE_HAL_DRIVER"/>
           <xsd:attribute name="Linker" type="xsd:string" use="optional" default="../gcc-arm-none-eabi_4.9.3_win32/bin/arm-none-eabi-g++"/>
           <xsd:attribute name="LDFLAGS" type="xsd:string" use="optional" default="-Wall -mcpu=cortex-m3 -Wl,--gc-section -mlittle-endian -mthumb"/>
           <xsd:attribute name="STM32Config" type="xsd:string" use="optional"/>
