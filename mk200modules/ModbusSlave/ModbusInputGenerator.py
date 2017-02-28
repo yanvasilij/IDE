@@ -41,7 +41,7 @@ class ModbusInputGenerator:
         numOfVars = len(variables)
         text = ""
         text += "#define INPUTS_ENTRY_NUMS {} /**< @brief num of entries in input register map */\n".format(numOfVars)
-        text += "static ModbusRegisterType {}[INPUTS_ENTRY_NUMS];\n\n".format(INPUT_REGISTER_MAP)
+        text += "static ModbusRegisterType __attribute__((section (\"._sdram\"))) {}[INPUTS_ENTRY_NUMS];\n\n".format(INPUT_REGISTER_MAP)
         text += "/**\n * @brief initialization modbus input register map\n */\n"
         text += "static void {} (void)\n".format(INIT_FUNCTION_NAME)
         text += "{\n"

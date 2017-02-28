@@ -64,7 +64,7 @@ class ModbusHoldingGenerator:
         numOfVars = len(variables)
         text = ""
         text += "#define HOLDING_ENTRY_NUMS {} /**< @brief num of entries in holding register map */\n".format(numOfVars)
-        text += "static ModbusRegisterType holdingsMap[HOLDING_ENTRY_NUMS];\n\n"
+        text += "static ModbusRegisterType __attribute__((section (\"._sdram\"))) holdingsMap[HOLDING_ENTRY_NUMS];\n\n"
         text += "/**\n * @brief initialization modbus holding register map\n */\n"
         text += "static void {} (void)\n".format(INIT_FUNCTION_NAME)
         text += "{\n"

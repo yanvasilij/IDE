@@ -171,7 +171,7 @@ class ModbusSlaveFile(CodeFile):
             varType = variable.gettype()
             if varLen > 1:
                 varType = "ARRAY [0..{0}] OF {1}".format(varLen-1, varType)
-            ret.append((variable.getname(), varType, variable.getinitial()))
+            ret.append((variable.getname(), varType, ""))
         ret.extend([("On"+variable.getname()+"Change", "python_poll", "")
                     for variable in variables
                     if variable.getonchange()])
