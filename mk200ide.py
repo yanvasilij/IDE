@@ -38,6 +38,10 @@ class MK200Beremiz (BeremizIDELauncher):
         BeremizIDELauncher.ImportModules(self)
         import BeremizIDE
         BeremizIDE.ProjectController.GetDefaultTargetName = lambda x: "MKLogik200"
+        import connectors
+        import yaplcconnectors
+        connectors.connectors.update(yaplcconnectors.connectors)
+
 
 if __name__ == '__main__':
     beremizApp = MK200Beremiz()
