@@ -29,9 +29,9 @@ HOLDING_AND_INPUTS = HOLDING_REGISTERS + INPUT_REGISTERS
 COIL = (COIL_READ, COIL_WRITE)
 DISCRETE_INPUT = (DISCRETE_INPUT_READ,)
 MODBUS_TYPES = HOLDING_REGISTERS + INPUT_REGISTERS + COIL + DISCRETE_INPUT
-MODBUS_TYPES_STR = ""
+MODBUS_TYPES_STR = []
 for mbType in MODBUS_TYPES:
-    MODBUS_TYPES_STR += mbType
+    MODBUS_TYPES_STR.append(mbType)
 
 class MBRequestDataTable (CustomTable):
 
@@ -63,8 +63,8 @@ class MBRequestDataTable (CustomTable):
                         grid.SetReadOnly(row, col, True)
                         continue
                 elif colname == "Modbus type":
-                    editor = wx.grid.GridCellChoiceEditor()
-                    editor.SetParameters(MODBUS_TYPES_STR)
+                    editor = wx.grid.GridCellChoiceEditor(MODBUS_TYPES_STR)
+                    #editor.SetParameters(MODBUS_TYPES_STR)
                 else:
                     grid.SetReadOnly(row, col, True)
 
