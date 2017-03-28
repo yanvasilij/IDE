@@ -3,7 +3,7 @@
 
 # Serial port class based on YaPySerial.py
 
-from yaplcconnectors.YAPLC.YaPySerial import *
+from YaPySerial import *
 import copy
 
 CONNECTION_ATTEMPS = 50

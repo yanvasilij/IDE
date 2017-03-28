@@ -4,7 +4,7 @@
 #MK200 connector, based on YAPLC connector, LPCProto.py and LPCAppProto.py
 #from PLCManager
 
-from yaplcconnectors.YAPLC.YAPLCProto import *
+from YAPLCProto import *
 from MK200Serial import *
 import copy
 import wx

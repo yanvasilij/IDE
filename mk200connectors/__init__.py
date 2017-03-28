@@ -22,7 +22,7 @@
 #Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-def YAPLC_connector_factory(uri, confnodesroot):
+def MK200_connector_factory(uri, confnodesroot):
     """
     This returns the connector to YAPLC style PLCobject
     """
@@ -32,13 +32,17 @@ def YAPLC_connector_factory(uri, confnodesroot):
 
     confnodesroot.logger.write(_("Connecting to:" + comportstr + "\n"))
 
-    from YAPLCObject import YAPLCObject
+    from MK200Object import MK200Object
 
     if os.name in ("nt", "ce"):
         lib_ext = ".dll"
     else:
         lib_ext = ".so"
 
-    YaPySerialLib = os.path.dirname(os.path.realpath(__file__)) + "/../../../YaPySerial/bin/libYaPySerial" + lib_ext
+    YaPySerialLib = os.path.dirname(os.path.realpath(__file__))
+    YaPySerialLib = os.path.dirname(YaPySerialLib)
+    YaPySerialLib = os.path.dirname(YaPySerialLib)
+    YaPySerialLib = os.path.join(YaPySerialLib, "YaPySerial", "bin", "libYaPySerial" + lib_ext)
+    print YaPySerialLib
 
-    return YAPLCObject(YaPySerialLib,confnodesroot,comportstr)
+    return MK200Object(YaPySerialLib,confnodesroot,comportstr)

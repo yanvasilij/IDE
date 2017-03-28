@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# @author Paul Beltyukov
+# Working with serial port through dynamic library
+# from YAPLC project
+
 import exceptions
 from threading import Timer, Thread, Lock, Semaphore
 import ctypes, os, commands, types, sys

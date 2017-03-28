@@ -39,8 +39,8 @@ class MK200Beremiz (BeremizIDELauncher):
         import BeremizIDE
         BeremizIDE.ProjectController.GetDefaultTargetName = lambda x: "MKLogik200"
         import connectors
-        import yaplcconnectors
-        connectors.connectors.update(yaplcconnectors.connectors)
+        import mk200connectors
+        connectors.connectors["MK200"] = lambda: mk200connectors.MK200_connector_factory
 
 
 if __name__ == '__main__':
