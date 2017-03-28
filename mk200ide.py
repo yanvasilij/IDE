@@ -18,6 +18,9 @@ from Beremiz import BeremizIDELauncher
 class MK200Beremiz (BeremizIDELauncher):
     def __init__(self):
         BeremizIDELauncher.__init__(self)
+        splashPath = os.path.dirname(os.path.realpath(__file__))
+        splashPath = os.path.join(splashPath, "images", "splash.png")
+        self.splashPath = splashPath
 
     def ImportModules(self):
         import features
