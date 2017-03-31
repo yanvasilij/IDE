@@ -34,6 +34,10 @@ class MK200Beremiz (BeremizIDELauncher):
             ('MKLogic201', _('MKLogic 201'), _('Plugin for MK201'), 'mk200modules.MK201.MK201ModuleFile'),
             ('MK200ModubsRequest', _('MK200 Modbus master request'), _('Plugin for MK201'), 'mk200modules.ModbusMaster.MK200ModbusRequestFile')]
 
+        features.libraries = [
+            ('Native', 'NativeLib.NativeLibrary'),
+            ('MK200',  'mk200libs.MK200Library')]
+
         import targets
         from mk200targets import mk200targets
         targets.targets = {}

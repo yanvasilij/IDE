@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Unknown"
+              productName="Unnamed"
+              productVersion="1"
+              creationDateTime="2013-01-29T14:01:00"/>
+    <contentHeader name="Unnamed"
+                   modificationDateTime="2013-02-26T15:59:13">
+        <coordinateInfo>
+            <fbd>
+                <scaling x="0" y="0"/>
+            </fbd>
+            <ld>
+                <scaling x="0" y="0"/>
+            </ld>
+            <sfc>
+                <scaling x="0" y="0"/>
+            </sfc>
+        </coordinateInfo>
+    </contentHeader>
+    <types>
+        <pous>
+            <pou name="WORD_AS_REAL" pouType="functionBlock">
+                <interface>
+                    <outputVars>
+                        <variable name="out">
+                            <type>
+                                <REAL/>
+                            </type>
+                        </variable>
+                    </outputVars>
+                    <inputVars>
+                        <variable name="inHigh">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                        <variable name="inLow">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <xhtml:p><![CDATA[OUT := 0.0;
+                        {{
+                        	unsigned int *p =(unsigned int*)&GetFbVar(OUT);
+                            *p = (unsigned short int)GetFbVar(INLOW);
+                            *p |= ((unsigned short int)GetFbVar(INHIGH))<<16;
+                        ;}}]]></xhtml:p>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="REAL_AS_WORD" pouType="functionBlock">
+                <interface>
+                    <inputVars>
+                        <variable name="in">
+                            <type>
+                                <REAL/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <outputVars>
+                        <variable name="outHigh">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                        <variable name="outLow">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </outputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <xhtml:p><![CDATA[outHigh := INT_TO_WORD(0);
+                        outLow := INT_TO_WORD(0);
+                        {{
+                            unsigned int *src = (unsigned int*) &GetFbVar(IN);
+                            GetFbVar(OUTHIGH) = ((*src)>>16) & 0xFFFF;
+                            GetFbVar(OUTLOW) = *src & 0xFFFF;
+                        ;}}]]></xhtml:p>
+                    </ST>
+                </body>
+            </pou>
+        </pous>
+    </types>
+  <instances>
+    <configurations/>
+  </instances>
+</project>
