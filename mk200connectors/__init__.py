@@ -27,6 +27,7 @@ def MK200_connector_factory(uri, confnodesroot):
     This returns the connector to YAPLC style PLCobject
     """
     import os
+    # import wx
 
     servicetype, comportstr = uri.split("://")
 
@@ -46,3 +47,13 @@ def MK200_connector_factory(uri, confnodesroot):
     print YaPySerialLib
 
     return MK200Object(YaPySerialLib,confnodesroot,comportstr)
+
+def MK201_connector_factory(uri, confnodesroot):
+    import os
+    import sys
+    from MK201Object import MK201Object
+
+    servicetype, comportstr = uri.split("://")
+    # print '_dist_folder = ', os.path.dirname(os.path.realpath(__file__))
+
+    return MK201Object(confnodesroot, comportstr)

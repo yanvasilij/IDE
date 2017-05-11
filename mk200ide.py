@@ -36,7 +36,8 @@ class MK200Beremiz (BeremizIDELauncher):
 
         features.libraries = [
             ('Native', 'NativeLib.NativeLibrary'),
-            ('MK200',  'mk200libs.MK200Library')]
+            ('MK200',  'mk200libs.MK200Library'),
+            ('MK200Modbus',  'mk200libs.MK200Modbus')]
 
         import targets
         from mk200targets import mk200targets
@@ -47,7 +48,10 @@ class MK200Beremiz (BeremizIDELauncher):
         BeremizIDE.ProjectController.GetDefaultTargetName = lambda x: "MKLogik200"
         import connectors
         import mk200connectors
+        connectors.connectors = {}
         connectors.connectors["MK200"] = lambda: mk200connectors.MK200_connector_factory
+        connectors.connectors["MK201"] = lambda: mk200connectors.MK201_connector_factory
+
 
 
 if __name__ == '__main__':
