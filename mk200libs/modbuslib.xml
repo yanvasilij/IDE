@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <fileHeader companyName="Unknown"
+                productName="Unnamed"
+                productVersion="1"
+                creationDateTime="2013-01-29T14:01:00"/>
+    <contentHeader name="Unnamed"
+                   modificationDateTime="2013-02-26T15:59:13">
+        <coordinateInfo>
+            <fbd>
+                <scaling x="0" y="0"/>
+            </fbd>
+            <ld>
+                <scaling x="0" y="0"/>
+            </ld>
+            <sfc>
+                <scaling x="0" y="0"/>
+            </sfc>
+        </coordinateInfo>
+    </contentHeader>
+    <types>
+        <pous>
+            <pou name="WORD_TO_MB" pouType="function">
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="IN_WORD">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                    <![CDATA[
+                     {{
+                     extern unsigned char setU16Holding (unsigned int adr, unsigned short int value);
+                     WORD_TO_MB = setU16Holding(ADDR, IN_WORD);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="MB_TO_WORD" pouType="function">
+                <interface>
+                    <returnType>
+                        <WORD/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned short int getU16Holding (unsigned int adr);
+                     MB_TO_WORD = getU16Holding(ADDR);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+        </pous>
+    </types>
+    <instances>
+        <configurations/>
+    </instances>
+</project>
