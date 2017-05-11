@@ -11,6 +11,7 @@ from MK200ModbusMaster_XSD import CODEFILE_XSD
 from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 from MK200ModbusRequestEditor import MK200ModbusRequestEditor
 from MBPortConfigPanel import DEFAULT_CONFIG
+from MBRequestDataPanel import MASTER_OPTION
 import copy
 
 CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
@@ -284,37 +285,21 @@ class MK200ModbusRequestFile (CodeFile):
         text += "#include \"iec_std_lib.h\"\n"
         text += "\n"
 
-        text += "#define USART_WordLength_8b ((u16)0x0000)\n"
-        text += "#define USART_WordLength_9b ((u16)0x1000)\n"
-        text += "#define USART_StopBits_1 ((u16)0x0000)\n"
-        text += "#define USART_StopBits_0_5 ((u16)0x1000)\n"
-        text += "#define USART_StopBits_2 ((u16)0x2000)\n"
-        text += "#define USART_StopBits_1_5 ((u16)0x3000)\n"
-        text += "#define USART_Parity_No ((u16)0x0000)\n"
-        text += "#define USART_Parity_Even ((u16)0x0400)\n"
-        text += "#define USART_Parity_Odd ((u16)0x0600)\n\n"
-
-        config = self.GetPortConfig()
-        comMbMasterInit = "com{}MbMasterInit".format(config["COM PORT"])
-        text += "extern void " + comMbMasterInit + "(u32 baud, u16 stopBits, u16 parity, u16 dataBits);\n\n"
-        comMbAddRequest = "comPort{}AddRequest".format(config["COM PORT"])
-        text += "extern void " + comMbAddRequest + "(RequestType * request);\n\n"
-
         text += self.GenerateVariblePrototypes()
-        #text += "#include \"config.h\"\n\n"
 
         text += self.GenerateRequestSturcts()
 
+        masterNum = [i for i in self.GetVariables() if i["Description"] == MASTER_OPTION]
+        if len(masterNum) == 0:
+            masterNum = 0
+        else:
+            masterNum = int(masterNum[0]["Modbus type"][-1])
+
         text += "int __init_%s(int argc,char **argv)\n{\n"%location_str
-        baud = config["BAUD"]
-        dataBits = config["DATA BITS"]
-        parity = config["PARITY"]
-        stopBits = config["STOPBITS"]
-        text += "\t" + comMbMasterInit + "({0},{1},{2},{3});\n".format(baud,stopBits,parity,dataBits)
 
         requests = [i for i in self.GetVariables() if i["Description"] == "Modus master request data"]
         for request in requests:
-            text += "\tcomPort{0}AddRequest(&req_{1});\n".format(config["COM PORT"], request["Name"])
+            text += "\tmodbusMasterAddRequest({0}, &req_{1});\n".format(masterNum, request["Name"])
 
         text += "\treturn 0;\n}\n\n"
 

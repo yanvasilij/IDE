@@ -11,6 +11,7 @@ from util.BitmapLibrary import GetBitmap
 from controls.VariablePanel import VARIABLE_NAME_SUFFIX_MODEL
 
 DESCRIPTION = "Modus master request data"
+MASTER_OPTION = "Master option"
 
 HOLDING_REGISTER_READ = "Holding read"
 HOLDING_REGISTER_WRITE = "Holding write"
@@ -32,6 +33,22 @@ MODBUS_TYPES = HOLDING_REGISTERS + INPUT_REGISTERS + COIL + DISCRETE_INPUT
 MODBUS_TYPES_STR = []
 for mbType in MODBUS_TYPES:
     MODBUS_TYPES_STR.append(mbType)
+
+HEIGHT = 20
+
+
+class ComboBoxWithLabel(wx.Panel):
+    def __init__(self, parent, labelText, cmbBxchoices):
+        wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
+        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.lable = wx.StaticText(self, label=labelText, size=wx.Size(100, HEIGHT))
+        newId = wx.NewId()
+        self.cmbbox = wx.ComboBox(self, id=newId, value="Master option",
+                                  choices=cmbBxchoices, size=wx.Size(100, HEIGHT))
+        main_sizer.Add(self.lable, flag=wx.ALIGN_CENTER_VERTICAL)
+        main_sizer.Add(self.cmbbox, flag=wx.ALIGN_CENTER_VERTICAL)
+
+        self.SetSizer(main_sizer)
 
 class MBRequestDataTable (CustomTable):
 
@@ -79,12 +96,12 @@ class MBRequestDataPanel (wx.Panel):
     def __init__    (self, parent, window, controler):
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
         """ main sizer """
-        main_sizer = wx.FlexGridSizer(cols=2, hgap=0, rows=1, vgap=4)
-        main_sizer.AddGrowableCol(1)
-        main_sizer.AddGrowableRow(0)
+        requestPanelSizer = wx.FlexGridSizer(cols=2, hgap=0, rows=1, vgap=4)
+        requestPanelSizer.AddGrowableCol(1)
+        requestPanelSizer.AddGrowableRow(0)
         """ sizer with control buttons """
         controls_sizer = wx.BoxSizer(wx.VERTICAL)
-        main_sizer.AddSizer(controls_sizer, border=5, flag=wx.ALL)
+        requestPanelSizer.AddSizer(controls_sizer, border=5, flag=wx.ALL)
         for name, bitmap, help in [
             ("AddVariableButton", "add_element", _("Add variable")),
             ("DeleteVariableButton", "remove_element", _("Remove variable")),
@@ -101,17 +118,26 @@ class MBRequestDataPanel (wx.Panel):
         self.VariablesGrid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.OnVariablesGridCellChange)
         self.VariablesGrid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnVariablesGridCellLeftClick)
         self.VariablesGrid.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN, self.OnVariablesGridEditorShown)
-        main_sizer.AddWindow(self.VariablesGrid, flag=wx.GROW)
+        requestPanelSizer.AddWindow(self.VariablesGrid, flag=wx.GROW)
         """ add header to grid """
-        labelSizer = wx.FlexGridSizer(cols=1, hgap=0, rows=2, vgap=4)
-        labelSizer.AddGrowableRow(1)
-        labelSizer.AddGrowableCol(0)
+        mainSizer = wx.FlexGridSizer(cols=1, hgap=0, rows=2, vgap=4)
+        mainSizer.AddGrowableRow(1)
+        mainSizer.AddGrowableCol(0)
+
+
+        headerSizer = wx.BoxSizer(wx.HORIZONTAL)
         label = wx.StaticText(self, label="      Request data")
         font = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         label.SetFont(font)
-        labelSizer.Add(label)
-        labelSizer.AddSizer(main_sizer, flag=wx.GROW)
-        self.SetSizer(labelSizer)
+        headerSizer.Add(label)
+
+        self.masterSelectCmbx = ComboBoxWithLabel(self, "", ("Master0", "Master1", "Master2"))
+        wx.EVT_COMBOBOX(self, self.masterSelectCmbx.cmbbox.GetId(), self.OnChangeMasterOption)
+        headerSizer.Add(self.masterSelectCmbx, flag=wx.ALIGN_CENTER_VERTICAL)
+
+        mainSizer.AddSizer(headerSizer, flag=wx.GROW)
+        mainSizer.AddSizer(requestPanelSizer, flag=wx.GROW)
+        self.SetSizer(mainSizer)
         self.ParentWindow = window
         self.Controler = controler
         """ request defaule data value """
@@ -190,10 +216,33 @@ class MBRequestDataPanel (wx.Panel):
             self.VariablesGrid.SetColSize(col, self.ColSizes[col])
         self.Table.ResetView(self.VariablesGrid)
 
+    def OnChangeMasterOption(self, event):
+        masterOptionOnFrame = self.masterSelectCmbx.cmbbox.GetStringSelection()
+        masterOptionInXml = [i for i in self.Controler.GetVariables() if i["Name"] == MASTER_OPTION]
+        if len(masterOptionInXml) > 0:
+            if masterOptionOnFrame != masterOptionInXml[0]:
+                self.RefreshModel()
+        else:
+            self.RefreshModel()
+        event.Skip()
+
+    def GetMasterOption(self):
+        return {"Name": "Master option",
+                "Address": "",
+                "Len": "",
+                "Device ID": "",
+                "Data type": u"WORD",
+                "Transfer method": "",
+                "Period": "",
+                "Description": MASTER_OPTION,
+                "Modbus type": self.masterSelectCmbx.cmbbox.GetStringSelection()}
+
     def RefreshModel(self):
         controllerVariables = self.Controler.GetVariables()
-        controllerVariables = [i for i in controllerVariables if i["Description"] != DESCRIPTION]
+        controllerVariables = [i for i in controllerVariables
+                               if i["Description"] not in (DESCRIPTION, MASTER_OPTION)]
         controllerVariables += self.Table.GetData()
+        controllerVariables.append(self.GetMasterOption())
         self.Controler.SetVariables(controllerVariables)
         self.RefreshBuffer()
 
@@ -202,6 +251,10 @@ class MBRequestDataPanel (wx.Panel):
         varForTable = [i for i in varForTable if i["Description"] == DESCRIPTION]
         self.Table.SetData(varForTable)
         self.Table.ResetView(self.VariablesGrid)
+        varForTable = self.Controler.GetVariables()
+        varForTable = [i for i in varForTable if i["Name"] == MASTER_OPTION]
+        if len(varForTable) > 0:
+            self.masterSelectCmbx.cmbbox.SetStringSelection(varForTable[0]["Modbus type"])
         self.VariablesGrid.RefreshButtons()
 
     def OnVariablesGridCellChange(self, event):

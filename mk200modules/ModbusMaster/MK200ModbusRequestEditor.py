@@ -42,25 +42,14 @@ class MK200ModbusRequestEditor (CodeFileEditor):
 
     def _create_CodePanel(self, prnt):
         """Main panel with notebook"""
-        self.CodeEditorPanel = wx.Panel(prnt)
-        sizer = wx.BoxSizer()
-        notebook = wx.Notebook(self.CodeEditorPanel)
         """ request edit panel """
-        self.DataEditor = MBRequestDataPanel(notebook, self.ParentWindow, self.Controler)
-        self.PortEditor = MBPortConfigPanel(notebook, self.ParentWindow, self.Controler)
-        self.VariablesPanel = self.DataEditor
-
-        notebook.AddPage(self.DataEditor, "Request data edit")
-        notebook.AddPage(self.PortEditor, "Port configuration")
-
-        sizer.Add(notebook, 1, wx.EXPAND)
-
-        self.CodeEditorPanel.SetSizer(sizer)
+        self.CodeEditorPanel = MBRequestDataPanel(prnt, self.ParentWindow, self.Controler)
+        self.VariablesPanel = self.CodeEditorPanel
         self.CodeEditor = self.CODE_EDITOR(self.CodeEditorPanel, self.ParentWindow, self.Controler)
         return self.CodeEditorPanel
 
     def RefreshView(self):
         CodeFileEditor.RefreshView(self)
-        self.DataEditor.RefreshView()
+        self.CodeEditorPanel.RefreshView()
         pass
 
