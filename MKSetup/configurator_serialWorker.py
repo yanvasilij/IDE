@@ -18,10 +18,12 @@ class serialWorker(Thread):
         self.standartComandsList = []
         self.ConsoleCommandsQueue = Queue()
         self.thredStatus = True
+        self.serialObject.serial.timeout = 0.05
     # def startThread(self):
     #     self.start() # start the thread
 
     def run(self):
+        self.cleanSerialBuffer()
         while self.connectionStatus and self.thredStatus:
             time.sleep(0.05)
             param = {}
@@ -31,7 +33,7 @@ class serialWorker(Thread):
                     portNum = cmd["str"].split()[1]
                 except:
                     portNum = '0'
-                param = self.sendParam(cmd["str"], cmd["responseFormat"])
+                param = self.sendParam(cmd)
                 # print(cmd)
                 # переделать под формат
                 if param is not None:
@@ -58,23 +60,30 @@ class serialWorker(Thread):
     def stopThread(self):
         self.thredStatus = False
 
-    def sendParam(self, cmd, responceFormat):
+    def cleanSerialBuffer(self):
+        self.serialObject.serial.write('')
+        self.serialObject.serial.reset_input_buffer()
+        self.serialObject.serial.reset_output_buffer()
+
+    def sendParam(self, cmd):
         try:
+            # self.cleanSerialBuffer()
             print('cmd', cmd)
-            self.serialObject.serial.write(cmd)
-            # param = self.serialObject.serial.read(len(cmd))
+            msg = cmd["str"]
+            self.serialObject.serial.write(msg)
             param1 = self.serialObject.read()
             print('param 1 ', param1 )
             param2 = self.serialObject.read()
             print('param 2 ', param2 )
-            if not (len(param1) == (len(cmd) + 1)):
+            if not (len(param1) == (len(msg) + 1)):
                 print('suka bly')
-                self.serialObject.serial.write('\n')
-                self.serialObject.read()
-                self.serialObject.read()
-                self.serialObject.read()
-                self.serialObject.read()
-                return ''
+                # self.serialObject.serial.write('\n')
+                # self.serialObject.read()
+                # self.serialObject.read()
+                # self.serialObject.read()
+                # self.serialObject.read()
+                self.cleanSerialBuffer()
+                self.ConsoleCommandsQueue.put(cmd)
             if param2 is not None:
                 return param2
             else:

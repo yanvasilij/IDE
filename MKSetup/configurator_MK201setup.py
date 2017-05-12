@@ -204,7 +204,7 @@ class Configurator_MK201(ConfiguratorGUI):
                 widgetGroup.baudrateCombobox.SetStringSelection(baud)
                 widgetGroup.parityCombobox.SetStringSelection(parity)
                 widgetGroup.databytesCombobox.SetStringSelection(stopBitsDict[stopBits])
-        if u"mode" in result:
+        if (u"mode" in result) and not('getcommode' in result):
             if (len(result_list) == 2):
                 modbus = result_list[1]
                 print(modbus)
