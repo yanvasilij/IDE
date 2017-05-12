@@ -132,7 +132,7 @@ class toolchain_gcc():
                     self.CTRInstance.logger.write(_("PLC :\n"))
                 
             for CFile, CFLAGS in CFilesAndCFLAGS:
-                if CFile.endswith(".c"):
+                if CFile.endswith(".c") or CFile.endswith(".cpp"):
                     bn = os.path.basename(CFile)
                     obn = os.path.splitext(bn)[0]+".o"
                     objectfilename = os.path.splitext(CFile)[0]+".o"
