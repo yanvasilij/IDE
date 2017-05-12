@@ -4,13 +4,6 @@ import sys
 import os
 
 
-# _dist_folder = os.path.dirname(os.path.realpath(__file__))
-# _dist_folder = os.path.split(_dist_fol    der)[0]
-# _dist_folder = os.path.split(_dist_folder)[0]
-# _module_dist = os.path.join(_dist_folder, "MKSetup")
-# sys.path.append(_module_dist)
-# print '_module_dist', _module_dist
-
 from threading import Lock
 from threading import Thread
 import wx
@@ -140,11 +133,6 @@ class MK201Object():
         total_load += answer
         print 'progress_answer',answer
 
-        # myDialog = wx.Dialog(self)
-        # myDialog.show()
-        # progressBar = wx.Gauge(self, id = wx.ID_ANY, range = 100)
-
-
     def GetPLCstatus(self):
         # if self.IsProgramming:
         #    return "Stopped", [1]
@@ -222,3 +210,4 @@ class loadDilog(wx.Dialog):
             self.statusBar.SetStatusText(downloadStatusMsg)
             print(downloadStatusMsg)
             self.downloadStatus = True
+            self.Destroy() 
