@@ -19,20 +19,49 @@ from mk201_proto import mk201_proto
 VERISON = '0.0.1'
 
 # wx ID
+
 ID_MAINWXFRAME = wx.NewId()
 ID_MAINWXDIALOGFRAME = wx.NewId()
 
+BTN_SIZE = (75, 23)
 
-class addLabelWidget(wx.Panel):
-    def __init__(self, parent, labelList = ['Empty_list'], *args, **kwds):
+TEXT_WIDGET_SIZE = (30, 13)
+PARITY_WIDGET_SIZE = (54, 21)
+BAUD_WIDGET_SIZE = (66, 21)
+DATA_WIDGET_SIZE = (70, 21)
+MBCOMBOX_WIDGET_SIZE = (147, 21)
+MBADDRESS_WIDGET_SIZE = (100, 21)
+
+NETWORK_WIDGET_SIZE = (50, 13)
+NETWORKADDRESS_WIDGET_SIZE = (120, 22)
+
+DATETIME_WIDGET_SIZE = (32, 21)
+
+class comLabels(wx.Panel):
+    def __init__(self, parent, *args, **kwds):
         wx.Panel.__init__(self, parent, *args, **kwds)
-        gridBoreder = 10
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        gridBoreder = 10
 
-        for el in labelList:
-            mainSizer.Add(wx.StaticText(self, label = el['label'], size = el['size']), 0.5, wx.ALL, gridBoreder)
+        self.portLbl = wx.StaticText(self, label = u"Порт", size = TEXT_WIDGET_SIZE)
+        self.parityLbl = wx.StaticText(self, label = u"Четность", size = PARITY_WIDGET_SIZE)
+        self.baudLbl = wx.StaticText(self, label = u"Скорость", size = BAUD_WIDGET_SIZE)
+        self.databutsLbl = wx.StaticText(self, label = u"Data bytes", size = DATA_WIDGET_SIZE)
+        self.mbCombobox = wx.StaticText(self, label = u"Настройка modbus", size = MBCOMBOX_WIDGET_SIZE)
+        self.mbAddress = wx.StaticText(self, label = u"Адрес modbus", size = MBADDRESS_WIDGET_SIZE)
+        self.btn = wx.StaticText(self, label = u"", size = BTN_SIZE)
+
+        mainSizer.Add(self.portLbl, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.parityLbl, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.baudLbl, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.databutsLbl, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.mbCombobox, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.mbAddress, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.btn, 0.5, wx.ALL, gridBoreder)
+
         self.SetSizer(mainSizer)
         self.Layout()
+
 
 class initComWidget(wx.Panel):
     def __init__(self, parent, comNum, *args, **kwds):
@@ -48,13 +77,14 @@ class initComWidget(wx.Panel):
 
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.portLabel = wx.StaticText(self, label = u"COM" + str(comNum))
-        self.parityCombobox = wx.ComboBox(self, choices = parity_list)
-        self.baudrateCombobox = wx.ComboBox(self, choices = baudrate_list)
-        self.databytesCombobox = wx.ComboBox(self, choices = stopbytes_list)
-        self.modbusCombobox = wx.ComboBox(self, choices = modbusSetting_list)
-        self.modbusAddress = wx.lib.intctrl.IntCtrl(self, min = 0, max = 255, limited = True)
-        self.writePortSettingBtn = wx.Button(self, wx.ID_ANY, u"Записать", name = 'writeBtnCOM1')
+        self.portLabel = wx.StaticText(self, label = u"COM" + str(comNum), size = TEXT_WIDGET_SIZE)
+        self.parityCombobox = wx.ComboBox(self, choices = parity_list, size = PARITY_WIDGET_SIZE)
+        self.baudrateCombobox = wx.ComboBox(self, choices = baudrate_list, size = BAUD_WIDGET_SIZE)
+        self.databytesCombobox = wx.ComboBox(self, choices = stopbytes_list, size = DATA_WIDGET_SIZE)
+        self.modbusCombobox = wx.ComboBox(self, choices = modbusSetting_list, size = MBCOMBOX_WIDGET_SIZE)
+        self.modbusAddress = wx.lib.intctrl.IntCtrl(self, min = 0, max = 255, limited = True, size = MBADDRESS_WIDGET_SIZE)
+        self.writePortSettingBtn = wx.Button(self, wx.ID_ANY, u"Записать", name = 'writeBtnCOM1', size = BTN_SIZE)
+        print self.writePortSettingBtn.GetSize()
 
         self.parityCombobox.SetSelection(1)
         self.baudrateCombobox.SetSelection(12)
@@ -72,6 +102,22 @@ class initComWidget(wx.Panel):
         self.SetSizer(mainSizer)
         self.Layout()
 
+class networkLabels(wx.Panel):
+    def __init__(self, parent, *args, **kwds):
+        wx.Panel.__init__(self, parent, *args, **kwds)
+        mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        gridBoreder = 10
+
+        self.addresType = wx.StaticText(self, label = u"Тип")
+        self.adderss = wx.StaticText(self, label = u"Адрес", style = wx.ALIGN_LEFT, size = NETWORKADDRESS_WIDGET_SIZE)
+        self.btn = wx.StaticText(self, label = u"", style = wx.ALIGN_LEFT, size = BTN_SIZE)
+
+        mainSizer.Add(self.addresType, 1, wx.ALL, gridBoreder)
+        mainSizer.Add(self.adderss, 1, wx.ALL, gridBoreder)
+        mainSizer.Add(self.btn, 1, wx.ALL, gridBoreder)
+
+        self.SetSizer(mainSizer)
+        self.Layout()
 
 class initNetworkWidget(wx.Panel):
     def __init__(self, parent, strName, defValue = '100.100.100.100',*args, **kwds):
@@ -80,15 +126,10 @@ class initNetworkWidget(wx.Panel):
         gridBoreder = 10
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.ipLabel = wx.StaticText(self, label =strName)
-        self.addressTextCtl = IpAddrCtrl(self)
+        self.ipLabel = wx.StaticText(self, label = strName, size = NETWORK_WIDGET_SIZE)
+        self.addressTextCtl = IpAddrCtrl(self, size = NETWORKADDRESS_WIDGET_SIZE)
         self.addressTextCtl.SetValue(defValue)
-        self.writeAddressBtn = wx.Button(self, label = u"Записать")
-
-        # print 'ipLabel ', self.ipLabel.GetSize()
-        # print 'addressTextCtl ', self.addressTextCtl.GetSize()
-        # print 'writeAddressBtn ', self.writeAddressBtn.GetSize()
-        # print 'readAddressBtn ', self.readAddressBtn.GetSize()
+        self.writeAddressBtn = wx.Button(self, label = u"Записать", size = BTN_SIZE)
 
         mainSizer.Add(self.ipLabel, 1, wx.ALL, gridBoreder)
         mainSizer.Add(self.addressTextCtl, 1, wx.ALL, gridBoreder)
@@ -115,16 +156,38 @@ class modbusWidget(wx.Panel):
         self.SetSizer(mainSizer)
         self.Layout()
 
+class dateLabels(wx.Panel):
+    def __init__(self, parent, *args, **kwds):
+        wx.Panel.__init__(self, parent, *args, **kwds)
+        mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        gridBoreder = 10
+
+        self.typeLabel = wx.StaticText(self, label = u"", style = wx.ALIGN_CENTRE_HORIZONTAL, size = TEXT_WIDGET_SIZE)
+        self.day = wx.StaticText(self, label = u"День", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.month = wx.StaticText(self, label = u"Месяц", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.year = wx.StaticText(self, label = u"Год", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.btn = wx.StaticText(self, label = u"", size = BTN_SIZE)
+
+        mainSizer.Add(self.typeLabel, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.day, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.month, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.year, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.btn, 0.5, wx.ALL, gridBoreder)
+
+
+        self.SetSizer(mainSizer)
+        self.Layout()
+
 class dateWidget(wx.Panel):
     def __init__(self, *args, **kwds):
         wx.Panel.__init__(self,  *args, **kwds)
         gridBoreder = 10
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.modbusSettingsLabel = wx.StaticText(self, label = u"Дата")
-        self.dayTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21) ,min = 0, max = 31, limited = True)
-        self.monthTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21), min = 0, max = 12, limited = True)
-        self.yearTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21), min = 0, max = 64, limited = True)
+        self.modbusSettingsLabel = wx.StaticText(self, label = u"Дата", size = DATETIME_WIDGET_SIZE)
+        self.dayTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE ,min = 0, max = 31, limited = True)
+        self.monthTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE, min = 0, max = 12, limited = True)
+        self.yearTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE, min = 0, max = 64, limited = True)
         self.dateWriteBtn = wx.Button(self, label = u"Записать")
 
         mainSizer.Add(self.modbusSettingsLabel, 1, wx.ALL, gridBoreder)
@@ -137,16 +200,57 @@ class dateWidget(wx.Panel):
         self.SetSizer(mainSizer)
         self.Layout()
 
+
+class modbusWidget(wx.Panel):
+    def __init__(self, *args, **kwds):
+        wx.Panel.__init__(self,  *args, **kwds)
+        gridBoreder = 10
+        mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.modbusSettingsLabel = wx.StaticText(self, label = u"Порт")
+        self.modbusSettingsTextCtl = wx.lib.intctrl.IntCtrl(self, pos = (5,65), size = (50, 20),
+                                                            min = 0, max = 65535, limited = True)
+        self.modbusSettingsWriteBtn = wx.Button(self, label = u"Записать")
+
+        mainSizer.Add(self.modbusSettingsLabel, 1, wx.ALL, gridBoreder)
+        mainSizer.Add(self.modbusSettingsTextCtl, 1, wx.ALL, gridBoreder)
+        mainSizer.Add(self.modbusSettingsWriteBtn, 1, wx.ALL, gridBoreder)
+
+        self.SetSizer(mainSizer)
+        self.Layout()
+
+class timdLabels(wx.Panel):
+    def __init__(self, parent, *args, **kwds):
+        wx.Panel.__init__(self, parent, *args, **kwds)
+        mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        gridBoreder = 10
+
+        self.typeLabel = wx.StaticText(self, label = u"", size = TEXT_WIDGET_SIZE)
+        self.hour = wx.StaticText(self, label = u"Часы", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.min = wx.StaticText(self, label = u"Мин", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.sec = wx.StaticText(self, label = u"Сек", style = wx.ALIGN_CENTRE_HORIZONTAL, size = DATETIME_WIDGET_SIZE)
+        self.btn = wx.StaticText(self, label = u"", size = BTN_SIZE)
+
+        mainSizer.Add(self.typeLabel, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.hour, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.min, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.sec, 0.5, wx.ALL, gridBoreder)
+        mainSizer.Add(self.btn, 0.5, wx.ALL, gridBoreder)
+
+
+        self.SetSizer(mainSizer)
+        self.Layout()
+
 class timeWidget(wx.Panel):
     def __init__(self, *args, **kwds):
         wx.Panel.__init__(self,  *args, **kwds)
         gridBoreder = 10
         mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.modbusSettingsLabel = wx.StaticText(self, label = u"Время")
-        self.hourTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21), min = 0, max = 23, limited = True)
-        self.minuteTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21), min = 0, max = 59, limited = True)
-        self.secondTextCtl = wx.lib.intctrl.IntCtrl(self, size = (21,21) ,min = 0, max = 59, limited = True)
+        self.modbusSettingsLabel = wx.StaticText(self, label = u"Время", size = TEXT_WIDGET_SIZE)
+        self.hourTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE, min = 0, max = 23, limited = True)
+        self.minuteTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE, min = 0, max = 59, limited = True)
+        self.secondTextCtl = wx.lib.intctrl.IntCtrl(self, size = DATETIME_WIDGET_SIZE, min = 0, max = 59, limited = True)
 
         self.timeWriteBtn = wx.Button(self, label = u"Записать")
 
@@ -220,13 +324,9 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
         '''Настройка TCP'''
         netwrokSettingsBox = wx.StaticBoxSizer(wx.StaticBox(self, label = u'Настройка TCP'),
                                                     wx.VERTICAL)
-        label_list = [{'label' : u'', 'size': (50, 13)},
-                      {'label' : u'Адрес', 'size': (113, 22)},
-                       {'label' : u'', 'size': (75, 23)},
-                        {'label' : u'', 'size': (75, 23)}
-                      ]
-        # label_widget = addLabelWidget(self, label_list)
-        # netwrokSettingsBox.Add(label_widget, 1, wx.EXPAND)
+
+        self.labelWidget = networkLabels(self)
+        netwrokSettingsBox.Add(self.labelWidget, 1, wx.EXPAND)
         self.ipWidget = initNetworkWidget(self, u'IP-адресс')
         netwrokSettingsBox.Add(self.ipWidget, 1, wx.EXPAND)
         self.gatewayWidget = initNetworkWidget(self, u'Шлюз')
@@ -239,6 +339,8 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
         '''Настройка COM-портов'''
         portSettingsBox = wx.StaticBoxSizer(wx.StaticBox(self, label = u'Настройка COM-портов'),
                                                     wx.VERTICAL)
+        self.comLabel = comLabels(self)
+        portSettingsBox.Add(self.comLabel, 1, wx.EXPAND)
         self.comWidget_1 = initComWidget(self, comNum = 1)
         portSettingsBox.Add(self.comWidget_1, 1, wx.EXPAND)
         self.comWidget_2 = initComWidget(self, comNum = 2)
@@ -249,10 +351,15 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
         self.mainsizer.Add(portSettingsBox)
 
         '''Настройка времени и даты'''
+
         dateSettingsBox = wx.StaticBoxSizer(wx.StaticBox(self, label = u'Настройка времени и даты'),
                                                     wx.VERTICAL)
+        self.dateSettingsLabel = dateLabels(self)
+        dateSettingsBox.Add(self.dateSettingsLabel, 1, wx.EXPAND)
         self.dateWidget = dateWidget(self)
         dateSettingsBox.Add(self.dateWidget, 1, wx.EXPAND)
+        self.timeSettingsLabels = timdLabels(self)
+        dateSettingsBox.Add(self.timeSettingsLabels, 1, wx.EXPAND)
         self.timeSettigsWidget = timeWidget(self)
         dateSettingsBox.Add(self.timeSettigsWidget, 1, wx.EXPAND)
 
@@ -261,7 +368,8 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
         '''Вывод времени '''
         curTimeSettingsBox = wx.StaticBoxSizer(wx.StaticBox(self, label = u'Текущее время'),
                                                     wx.VERTICAL)
-        # self.curTimeWidget = timeWidget(self)
+        self.timeLabels = timdLabels(self)
+        curTimeSettingsBox.Add(self.timeLabels, 1, wx.EXPAND)
         self.curTimeWidget = timeWidget(self)
         curTimeSettingsBox.Add(self.curTimeWidget, 1, wx.EXPAND)
 
