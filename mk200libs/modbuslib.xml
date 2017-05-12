@@ -23,7 +23,7 @@
     </contentHeader>
     <types>
         <pous>
-            <pou name="WORD_TO_MB" pouType="function">
+            <pou name="WORD_TO_MB_HOLDING" pouType="function">
                 <interface>
                     <returnType>
                         <INT/>
@@ -48,13 +48,13 @@
                     <![CDATA[
                      {{
                      extern unsigned char setU16Holding (unsigned int adr, unsigned short int value);
-                     WORD_TO_MB = setU16Holding(ADDR, IN_WORD);
+                     WORD_TO_MB_HOLDING = setU16Holding(ADDR, IN_WORD);
                      }}
                     ]]>
                     </ST>
                 </body>
             </pou>
-            <pou name="MB_TO_WORD" pouType="function">
+            <pou name="MB_HOLDING_TO_WORD" pouType="function">
                 <interface>
                     <returnType>
                         <WORD/>
@@ -72,7 +72,172 @@
                         <![CDATA[
                      {{
                      extern unsigned short int getU16Holding (unsigned int adr);
-                     MB_TO_WORD = getU16Holding(ADDR);
+                     MB_HOLDING_TO_WORD = getU16Holding(ADDR);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="WORD_TO_MB_INPUT" pouType="function">
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="IN_WORD">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned char setU16Input(unsigned int adr, unsigned short int value);
+                     WORD_TO_MB_INPUT = setU16Input(ADDR, IN_WORD);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="MB_INPUT_TO_WORD" pouType="function">
+                <interface>
+                    <returnType>
+                        <WORD/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned short int getU16Input (unsigned int adr);
+                     MB_INPUT_TO_WORD = getU16Input(ADDR);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="SET_COIL" pouType="function">
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="COIL_VALUE">
+                            <type>
+                                <BOOL/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned char setCoil (unsigned int adr, unsigned char value);
+                     SET_COIL = setCoil(ADDR, COIL_VALUE);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="GET_COIL" pouType="function">
+                <interface>
+                    <returnType>
+                        <BOOL/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned char getCoil (unsigned int adr);
+                     GET_COIL = getCoil(ADDR);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="SET_DISC" pouType="function">
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="DISC_VALUE">
+                            <type>
+                                <BOOL/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned char setDisc (unsigned int adr, unsigned char value);
+                     SET_DISC = setDisc(ADDR, DISC_VALUE);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+            </pou>
+            <pou name="GET_DISC" pouType="function">
+                <interface>
+                    <returnType>
+                        <BOOL/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     extern unsigned char getDisc (unsigned int adr);
+                     GET_DISC = getDisc(ADDR);
                      }}
                     ]]>
                     </ST>
