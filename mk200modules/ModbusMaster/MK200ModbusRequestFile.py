@@ -281,19 +281,29 @@ class MK200ModbusRequestFile (CodeFile):
         current_location = self.GetCurrentLocation()
         location_str = "_".join(map(str, current_location))
         text = "#include \"MbMasterTypes.h\"\n\n"
-        text += "#include \"accessor.h\"\n"
-        text += "#include \"iec_std_lib.h\"\n"
-        text += "\n"
 
-        text += self.GenerateVariblePrototypes()
-
-        text += self.GenerateRequestSturcts()
-
+        """Here creats file for C-extension usage"""
+        modbusAccesorHeaderText = ""
+        modbusAccesorHeaderText += "#include \"accessor.h\"\n"
+        modbusAccesorHeaderText += "#include \"iec_std_lib.h\"\n"
+        modbusAccesorHeaderText += "\n"
+        modbusAccesorHeaderText += self.GenerateVariblePrototypes()
         masterNum = [i for i in self.GetVariables() if i["Description"] == MASTER_OPTION]
         if len(masterNum) == 0:
             masterNum = 0
         else:
             masterNum = int(masterNum[0]["Modbus type"][-1])
+        modbusAccesorHeaderName = "MK200ModbusRequest_%s.h"%location_str
+        modbusAccesorHeader = os.path.join(buildpath, modbusAccesorHeaderName)
+        mbsAccHdrFile = open(modbusAccesorHeader,'w')
+        mbsAccHdrFile.write(modbusAccesorHeaderText)
+        mbsAccHdrFile.close()
+        """Include this header to .c file"""
+        text += "#include \"%s\"\n\n"%modbusAccesorHeaderName
+
+        text += self.GenerateRequestSturcts()
+
+
 
         text += "int __init_%s(int argc,char **argv)\n{\n"%location_str
 
