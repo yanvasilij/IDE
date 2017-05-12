@@ -4,7 +4,10 @@
 *.py~
 *.hgignore
 *directory
+*.py.orig
 *~
 /run.bat
 /yaplctargets/mk200ide.py
 /.hg
+/MKSetup/.hg/*
+
