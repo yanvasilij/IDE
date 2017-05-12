@@ -43,6 +43,7 @@ class MKLogik200_target(toolchain_gcc):
         includePathes = [r'-I ' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\beremizStm32Port\source\inc' + "\""]
         includePathes.append(r'-I' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\modbusMasterLib\inc' + "\"" )
         includePathes.append(r'-I' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\FreeModbus\xCpp\include' + "\"")
+        includePathes.append(r'-I' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\source\inc' + "\"")
         additionincludepath = os.path.split(self.exe_path)[0]
         additionincludepath = os.path.split(additionincludepath)[0]
         additionincludepath = os.path.join(additionincludepath, "inc")
