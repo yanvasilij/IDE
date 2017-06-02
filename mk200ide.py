@@ -27,6 +27,7 @@ class MK200Beremiz (BeremizIDELauncher):
         features.catalog = [
             ('c_ext', _('C extension'), _('Add C code accessing located variables synchronously'), 'c_ext.CFile'),
             ('MKLogic201', _('MKLogic 201'), _('Plugin for MK201'), 'mk200modules.MK201.MK201ModuleFile'),
+            ('MK200CANOpen', _('MK200 CANOpen'), _('External MK200 modules'), 'mk200modules.MK200CANOpen.RootClass'),
             ('MK200ModubsRequest', _('MK200 Modbus master request'), _('Plugin for MK201'), 'mk200modules.ModbusMaster.MK200ModbusRequestFile')]
 
         features.libraries = [
@@ -47,6 +48,19 @@ class MK200Beremiz (BeremizIDELauncher):
         connectors.connectors["MK200"] = lambda: mk200connectors.MK200_connector_factory
         connectors.connectors["MK201"] = lambda: mk200connectors.MK201_connector_factory
 
+        """ Adding creation folders inc and src after creation new project """
+        NewProject = BeremizIDE.ProjectController.NewProject
+        def NewProjectWrapper (self_, ProjectPath, BuildPath=None):
+            rez = NewProject(self_, ProjectPath, BuildPath)
+            if rez == None:
+                includeDir = os.path.join(ProjectPath, "inc")
+                sourceDir = os.path.join(ProjectPath, "src")
+                if not os.path.exists(includeDir):
+                    os.mkdir(includeDir)
+                if not os.path.exists(sourceDir):
+                    os.mkdir(sourceDir)
+            return rez
+        BeremizIDE.ProjectController.NewProject = NewProjectWrapper
 
 
 if __name__ == '__main__':
