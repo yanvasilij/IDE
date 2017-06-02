@@ -53,7 +53,7 @@ class MK201AoEditor (wx.Panel):
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.title = wx.StaticText(self, label="Analog input configuration")
+        self.title = wx.StaticText(self, label="Analog output configuration")
         font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.BOLD)
         self.title.SetFont(font)
         main_sizer.Add(self.title, flag=wx.ALIGN_CENTER_VERTICAL)
