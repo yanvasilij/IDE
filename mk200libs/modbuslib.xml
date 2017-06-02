@@ -47,7 +47,11 @@
                     <ST>
                     <![CDATA[
                      {{
-                     extern unsigned char setU16Holding (unsigned int adr, unsigned short int value);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setU16Holding (u32 adr, u16 value);
                      WORD_TO_MB_HOLDING = setU16Holding(ADDR, IN_WORD);
                      }}
                     ]]>
@@ -71,7 +75,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned short int getU16Holding (unsigned int adr);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u16 getU16Holding (u32 adr);
                      MB_HOLDING_TO_WORD = getU16Holding(ADDR);
                      }}
                     ]]>
@@ -102,7 +110,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned char setU16Input(unsigned int adr, unsigned short int value);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setU16Input(u32 adr, u16 value);
                      WORD_TO_MB_INPUT = setU16Input(ADDR, IN_WORD);
                      }}
                     ]]>
@@ -126,7 +138,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned short int getU16Input (unsigned int adr);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u16 getU16Input (u32 adr);
                      MB_INPUT_TO_WORD = getU16Input(ADDR);
                      }}
                     ]]>
@@ -157,7 +173,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned char setCoil (unsigned int adr, unsigned char value);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setCoil (u32 adr, u8 value);
                      SET_COIL = setCoil(ADDR, COIL_VALUE);
                      }}
                     ]]>
@@ -181,7 +201,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned char getCoil (unsigned int adr);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 getCoil (u32 adr);
                      GET_COIL = getCoil(ADDR);
                      }}
                     ]]>
@@ -212,7 +236,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned char setDisc (unsigned int adr, unsigned char value);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setDisc (u32 adr, u8 value);
                      SET_DISC = setDisc(ADDR, DISC_VALUE);
                      }}
                     ]]>
@@ -236,7 +264,11 @@
                     <ST>
                         <![CDATA[
                      {{
-                     extern unsigned char getDisc (unsigned int adr);
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 getDisc (u32 adr);
                      GET_DISC = getDisc(ADDR);
                      }}
                     ]]>
