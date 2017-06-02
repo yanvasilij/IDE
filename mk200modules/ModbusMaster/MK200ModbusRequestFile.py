@@ -195,6 +195,7 @@ class MK200ModbusRequestFile (CodeFile):
                 "Disc": "MBDiscRead"
             }
         requestStruct = ""
+        prototypes = ""
         iecChannel = self.GetFullIEC_Channel()[:1]
         for request, i in zip(requests, range(0, len(requests))):
             varName = request["Name"]
@@ -252,6 +253,7 @@ class MK200ModbusRequestFile (CodeFile):
                     requestStruct += "\t}\n"
             requestStruct += "};\n\n"
 
+            prototypes += "RequestType req_" + request["Name"] + ";\r\n"
             requestStruct += "RequestType req_" + request["Name"] + " =\n{\n"
             requestStruct += "\t" + REQUEST_TYPES[request["Modbus type"]] + ",\n"
             requestStruct += "\tMBRequestSuccesfulyDone,\n"
@@ -275,15 +277,14 @@ class MK200ModbusRequestFile (CodeFile):
             requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}.status;\n".format(iecChannel, i, 1, request["Name"])
             requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}.error;\n".format(iecChannel, i, 2, request["Name"])
             requestStruct += "\n"
-        return requestStruct
+        return requestStruct, prototypes
 
     def CTNGenerate_C(self, buildpath, locations):
         current_location = self.GetCurrentLocation()
         location_str = "_".join(map(str, current_location))
-        text = "#include \"MbMasterTypes.h\"\n\n"
 
         """Here creats file for C-extension usage"""
-        modbusAccesorHeaderText = ""
+        modbusAccesorHeaderText = "#include \"MbMasterTypes.h\"\n\n"
         modbusAccesorHeaderText += "#include \"accessor.h\"\n"
         modbusAccesorHeaderText += "#include \"iec_std_lib.h\"\n"
         modbusAccesorHeaderText += "\n"
@@ -297,13 +298,16 @@ class MK200ModbusRequestFile (CodeFile):
         modbusAccesorHeader = os.path.join(buildpath, modbusAccesorHeaderName)
         mbsAccHdrFile = open(modbusAccesorHeader,'w')
         mbsAccHdrFile.write(modbusAccesorHeaderText)
-        mbsAccHdrFile.close()
         """Include this header to .c file"""
-        text += "#include \"%s\"\n\n"%modbusAccesorHeaderName
+        text = "#include \"%s\"\n\n"%modbusAccesorHeaderName
 
-        text += self.GenerateRequestSturcts()
+        structurest, prototypes = self.GenerateRequestSturcts()
 
+        """ Add structrure prototypes to header file """
+        mbsAccHdrFile.write(prototypes)
+        mbsAccHdrFile.close()
 
+        text += structurest
 
         text += "int __init_%s(int argc,char **argv)\n{\n"%location_str
 

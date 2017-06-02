@@ -87,9 +87,9 @@ class MK201DiEditor (MK201IOEditor):
             self.RefreshModel()
         for chPanel, chCfg in zip(self.inputs, config):
             if chCfg["Options"] == "On":
-                chPanel.isOnChkbx.SetValue (True)
+                chPanel.isOnChkbx.SetValue(True)
             else:
-                chPanel.isOnChkbx.SetValue (False)
+                chPanel.isOnChkbx.SetValue(False)
 
     def RefreshModel(self):
         controllerVariables = self.Controler.GetVariables()
