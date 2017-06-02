@@ -135,9 +135,9 @@ class toolchain_gcc():
                 if CFile.endswith(".c") or CFile.endswith(".cpp"):
                     bn = os.path.basename(CFile)
                     obn = os.path.splitext(bn)[0]+".o"
-                    objectfilename = os.path.splitext(CFile)[0]+".o"
+                    objectfilename = os.path.splitext(os.path.join(self.buildpath, bn))[0]+".o"
 
-                    match = self.check_and_update_hash_and_deps(bn)
+                    match = self.check_and_update_hash_and_deps(CFile)
 
                     if match:
                         self.CTRInstance.logger.write("   [pass]  "+bn+" -> "+obn+"\n")
@@ -184,7 +184,7 @@ class toolchain_gcc():
                         self.exe_path,
                         ALLldflags)
                    ).spin()
-            
+
             if status :
                 return False
 
@@ -199,7 +199,7 @@ class toolchain_gcc():
                  hexfile)
             ).spin()
 
-            if status :
+            if status:
                 return False
 
         else:
