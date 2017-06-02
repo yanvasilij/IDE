@@ -27,6 +27,7 @@ class MK201Object():
         self.confnodesroot._callConfigurator = self._Configurator
         # перегружаю метод _Disconnect, чтобы выполнить свои дейсвтия
         self.confnodesroot._Disconnect = self.disconnect
+        # self.confnodesroot.UpdateMethodsFromPLCStatus = self.UpdateMethodsFromPLCStatus
         # в список объектов toolBar-а добавляю вызов конфигуратора
         self.StatusMethods.append({"bitmap" : "configurator",
                                    "shown" : False,
@@ -36,7 +37,6 @@ class MK201Object():
         self.projectPath = self.confnodesroot.GetProjectPath()
         self.projectName = self.confnodesroot.GetProjectName()
         self.hexfilepath = self.confnodesroot.GetProjectPath() + '\\build\\' + self.projectName + '.hex'
-        print 'hexfilepath ', self.hexfilepath
         self.PLCStatus = "Disconnected"
         self.comport = comportstr
         self.TransactionLock.acquire()
@@ -44,30 +44,23 @@ class MK201Object():
         self.TransactionLock.release()
         # self.MenuToolBar.Realize()
 
+
     def connect(self):
         res = self.SerialConnection.connect(self.comport)
-        print ('connect', res)
         self.confnodesroot.ShowMethod('_callConfigurator', True)
         if not (res == 'Connected'):
-            errodDialog = self.dialogMessage(u'Ошибка подключения COM-порт не доступен')
-            # errodDialog.Show()
-            # self.confnodesroot._Disconnect()
-            wx.CallAfter(self.confnodesroot._Disconnect)
+            self.dialogMessage(u'Ошибка подключения, COM-порт не доступен.')
+            wx.CallAfter(self.disconnect)
 
     def disconnect(self):
+        self.SerialConnection.serial.close()
         self.confnodesroot.ShowMethod('_callConfigurator', False)
         self.confnodesroot._SetConnector(None)
-        res = self.SerialConnection.serial.close()
-        self.SerialConnection = None
-        if not(self.failure is None):
-            self.dialogMessage(self.failure)
-        print 'Disconnected'
 
     def dialogMessage(self, message):
         dialog = wx.MessageBox(message, u'Ошибка!', wx.OK | wx.ICON_INFORMATION)
 
     def _HandleSerialTransaction(self, transaction, must_do_lock):
-        print "_HandleSerialTransaction"
         res = None
         failure = None
         # Must acquire the lock
@@ -77,15 +70,9 @@ class MK201Object():
             # Do the job
             transaction.SendCommand()
             self.PLCStatus, res = transaction.GetCommandAck()
-            print 'PLCStatus, res ', self.PLCStatus, res
             if self.PLCStatus is None:
-                # self.SerialConnection.serial.close()
-                # self.SerialConnection = None
-                failure = _('Disconected from module')
+                failure = res
                 self.PLCStatus = None
-                self.disconnect()
-                print 'failure', failure
-        # Must release the lock
         if must_do_lock:
             self.TransactionLock.release()
         return res, failure
@@ -94,28 +81,26 @@ class MK201Object():
         res = None;
         failure = None;
         res, self.failure = self._HandleSerialTransaction(transaction, True)
-        if failure is not None:
-            print(failure + "\n")
-            self.confnodesroot.logger.write_warning(failure + "\n")
-        print ('HandleSerialTransaction')
+        if self.failure is not None:
+            self.confnodesroot.logger.write_error(self.failure + "\n")
+            res = None
         return res
 
     def StartPLC(self):
-        print ('StartPLC')
+        pass
 
     def StopPLC(self):
-        self.SerialConnection.serial.close()
-        print ('StopPLC')
+        pass
 
     def NewPLC(self, md5sum, data, extrafiles):
-        print 'NewPLC'
-        print self
-        self.IsProgramming
+        self.IsProgramming = True
         self.progressDialog = loadDilog(self.confnodesroot.AppFrame, self.hexfilepath, self.comport, self.SerialConnection)
         res = self.progressDialog.ShowModal()
-        self.progressDialog.Destroy()
+        # self.progressDialog.Destroy()
+        self.IsProgramming = False
         self.parent = None
-        # return self.PLCStatus == "Stopped"
+        return self.PLCStatus == "Stopped"
+        return True
 
     def _Configurator(self):
         self.IsProgramming = True
@@ -123,30 +108,21 @@ class MK201Object():
         res = myDialog.ShowModal()
         myDialog.Destroy()
         self.IsProgramming = False
-        print self.SerialConnection.HexLineTypes
-
-    def loadStatus(self, msg):
-        answer = msg.data
-        # if (type(answer) == int):
-        self.progressBar.SetValue((answer - 1) * 10)
-        # self.progressBar.SetValue(answer)
-        total_load += answer
-        print 'progress_answer',answer
 
     def GetPLCstatus(self):
         # if self.IsProgramming:
         #    return "Stopped", [1]
         # res = self.HandleSerialTransaction(GET_PLCStatusTransaction(self.SerialConnection))
         # if res is None:
-        #    return None, [1]
+        #     # убираю из toolbar-а мой виджет, т.к. далее в беремизе конектор удаляется, а мой виджет остается внутри беремиза
+        #     self.confnodesroot.ShowMethod('_callConfigurator', False)
+        #     return None, [1]
         # else:
-        #    return "Stopped", [1]
-        # return self.PLCstatus
-        return "Stopped", [1]
+            return "Stopped", [1]
 
     def MatchMD5(self, MD5):
-        return True
-        print ('MatchMD5')
+        # return False
+        pass
 
     def GetTraceVariables(self):
         return "Stoped", []
@@ -174,9 +150,6 @@ class loadDilog(wx.Dialog):
         # self.Bind(wx.EVT_CLOSE, self.closeDialog)
         wx.EVT_CLOSE(self, self.closeDialog)
         Publisher().subscribe(self.loadStatus, "update")
-        # EVT_RESULT(self, self.updateDisplay)
-        # EVT_RESULT(self, self.loadStatus)
-        # self.startThread()
 
     def closeDialog(self, event):
         if self.downloadStatus == True:
@@ -186,12 +159,8 @@ class loadDilog(wx.Dialog):
 
     def startThread(self):
         self.loadThred = Thread(target = self.modulOpject.load_hex_mk201, args=(self.hexFilePath, '0'))
-        # self.loadThred = Thread(target = self.printLol)
+        # self.loadThred = Thread(target = self.# printLol)
         self.loadThred.start()
-
-    def printLol(self):
-        for i in range(25):
-            print 'lol ' + str(i)
 
     def loadStatus(self, msg):
         answer = msg.data
@@ -199,15 +168,16 @@ class loadDilog(wx.Dialog):
             self.progressBar.SetValue((answer - 1) * 10)
             self.statusBar.SetStatusText(str( (answer - 1)*10) + '%')
         if (type(answer) is str):
-            print answer
+            # print answer
             # if 'Download' in str(answer):
-            #     print('Download success')
+            #     # print('Download success')
             # if 'Done' in answer:
             #     downloadStatusMsg = 'Download success'
             # else:
             #     downloadStatusMsg = 'Download canceled. Error: %s. ' % str(answer)
+            time.sleep(5) # ожидание для того чтобы в модуле прошла начальная инициализация и он смог отвечать
             downloadStatusMsg = 'Download success'
             self.statusBar.SetStatusText(downloadStatusMsg)
-            print(downloadStatusMsg)
+            # print(downloadStatusMsg)
             self.downloadStatus = True
-            self.Destroy() 
+            self.Destroy()
