@@ -15,7 +15,7 @@ class MK200TransactionBase(object):
         self.Command = None
 
     def SendCommand(self):
-        self.serialPort.Write(self.Command)
+        self.serialPort.write(self.Command)
 
     def GetCommandAck(self):
         time.sleep(0.05)
@@ -39,26 +39,30 @@ class GET_PLCStatusTransaction(MK200TransactionBase):
         MK200TransactionBase.__init__(self, serialProt)
         self.serialPort = serialProt
         self.Command = "GetPlcStatus\r\n"
+        self.serialPort.serial.reset_input_buffer()
         self.serialPort.write(self.Command)
         self.Status = None
 
     def GetCommandAck(self):
         res = self.serialPort.read()
-        print 'res', res, type(res)
-        # initital = res.replace("\r", "\\r")
-        # initital = initital.replace("\n", "\\n")
+        res = self.serialPort.read()
+        if type(res) is list:
+            self.Status = None
+            return self.Status, res[0]
+        initital = res.replace("\r", "\\r")
+        initital = initital.replace("\n", "\\n")
         # res = res.split("\\n")
         if len(res) > 2:
             res = res[1]
-        if res == "Stopped\r":
+        if initital == "Stopped\\r\\n":
             self.Status = "Stopped"
             return self.Status, 0x55
-        elif res == "Running\r":
+        elif initital == "Running\\r\\n":
             self.Status = "Started"
             return self.Status, 0xaa
         else:
             self.Status = None
-            return self.Status, 0xaa
+            return self.Status, "MK200 transaction error - controller did not ack order!"
             return("MK200 transaction error - controller did not ack order!")
 
     def ExchangeData(self):

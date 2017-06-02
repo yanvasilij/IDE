@@ -41,9 +41,11 @@ class serialWorker(Thread):
                     queueParam[u"portNum"] = portNum
                     wx.CallAfter(Publisher().sendMessage, "result", queueParam)
                 else:
-                    print 'Read error ', cmd, param
+                    pass
+                    # print 'Read error ', cmd, param
+            # self.checkConection()
             self.standartComands()
-            self.checkConection()
+
 
     def standartComands(self):
         if not (len(self.standartComandsList) == 0):
@@ -54,8 +56,10 @@ class serialWorker(Thread):
 
     def checkConection(self):
         self.connectionStatus = self.serialObject.checkConnection()
+        # print 'self.connectionStatus ', self.connectionStatus
         if not self.connectionStatus:
-            wx.CallAfter(Publisher().sendMessage, "lostConection", "Conection lost")
+            # print 'lostConection'
+            wx.CallAfter(Publisher().sendMessage, "lostConection")
 
     def stopThread(self):
         self.thredStatus = False
@@ -68,20 +72,15 @@ class serialWorker(Thread):
     def sendParam(self, cmd):
         try:
             # self.cleanSerialBuffer()
-            print('cmd', cmd)
+            # print('cmd', cmd)
             msg = cmd["str"]
             self.serialObject.serial.write(msg)
             param1 = self.serialObject.read()
-            print('param 1 ', param1 )
+            # print('param 1 ', param1 )
             param2 = self.serialObject.read()
-            print('param 2 ', param2 )
+            # print('param 2 ', param2 )
             if not (len(param1) == (len(msg) + 1)):
-                print('suka bly')
-                # self.serialObject.serial.write('\n')
-                # self.serialObject.read()
-                # self.serialObject.read()
-                # self.serialObject.read()
-                # self.serialObject.read()
+                # print('suka bly')
                 self.cleanSerialBuffer()
                 self.ConsoleCommandsQueue.put(cmd)
             if param2 is not None:
@@ -89,5 +88,5 @@ class serialWorker(Thread):
             else:
                 return None
         except StandardError as err:
-            print u"get param error " + str(err)
+            return u"Error: " + str(err[0])
 

@@ -62,11 +62,13 @@ class SerialPort(object):
             # return None
 
     def checkConnection(self):
-        status = self.serial.isOpen()
-        if status:
-            return True
-        else:
-            return False
+        try:
+            self.serial.readline()
+            status = True
+        except:
+            print 'hui'
+            status = False
+        return status
 
     def getPorts(self):
         portsFullName = []

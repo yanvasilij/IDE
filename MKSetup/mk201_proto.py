@@ -56,7 +56,7 @@ class mk201_proto(SerialPort):
                 loaded_part = loaded_part + 1
                 wx.CallAfter(Publisher().sendMessage, "update", loaded_part)
         finally:
-            time.sleep(0.5)
+            time.sleep(1)
             self.serialAnswer = self.read()
             self.serialAnswer = self.read()
             print(self.serialAnswer)

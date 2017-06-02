@@ -24,7 +24,7 @@ class Configurator_MK201(ConfiguratorGUI):
         self.moduleObject = self.modulObj
         if parent is None:
             res = self.moduleObject.connect('COM6')
-            print(res)
+            # print(res)
         self.comWidget_1.writePortSettingBtn.Bind(wx.EVT_BUTTON, self.setComSettings)
         self.comWidget_2.writePortSettingBtn.Bind(wx.EVT_BUTTON, self.setComSettings)
         self.comWidget_3.writePortSettingBtn.Bind(wx.EVT_BUTTON, self.setComSettings)
@@ -44,7 +44,9 @@ class Configurator_MK201(ConfiguratorGUI):
         self.msgQueue = self.serialTread.ConsoleCommandsQueue
         self.firstRequest()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+        # Publisher().subscribe(self.OnClose, "lostConection")
         Publisher().subscribe(self.updateDisplay, "result")
+        Publisher().subscribe(self.OnClose, "lostConection")
 
     def firstRequest(self):
         for comNuum in range(3):
@@ -120,7 +122,7 @@ class Configurator_MK201(ConfiguratorGUI):
     def setAddress(self, event):
         eventObject = event.GetEventObject()
         addressType = eventObject.Parent.addressType
-        print('addressType ', addressType)
+        # print('addressType ', addressType)
         address = eventObject.Parent.addressTextCtl.GetAddress()
         address = address.replace('.', ' ')
         if addressType == u'IP-адресс':
@@ -133,12 +135,12 @@ class Configurator_MK201(ConfiguratorGUI):
             cmd_networkSetting = {'str': 'setnmask: {0}\r\n'.format(address),
                'responseFormat': 'Done\r\n'}
         self.msgQueue.put(cmd_networkSetting)
-        print(cmd_networkSetting)
+        # print(cmd_networkSetting)
 
     def getAddress(self, event):
         eventObject = event.GetEventObject()
         addressType = eventObject.Parent.addressType
-        print('addressType ', addressType)
+        # print('addressType ', addressType)
         if addressType == u'IP-адресс':
             cmd_networkSetting = {'str': 'getip\r\n',
                'responseFormat': 'Done\r\n'}
@@ -149,7 +151,7 @@ class Configurator_MK201(ConfiguratorGUI):
             cmd_networkSetting = {'str': 'getnmask\r\n',
                'responseFormat': 'Done\r\n'}
         self.msgQueue.put(cmd_networkSetting)
-        print(cmd_networkSetting)
+        # print(cmd_networkSetting)
 
     def getDate(self, event):
         cmd_getdate = {'str': 'getdate\r\n',
@@ -165,7 +167,7 @@ class Configurator_MK201(ConfiguratorGUI):
         year = parentWidget.yearTextCtl.GetLineText(0)
         cmd_setdate = {'str': 'setdate: {0} {1} {2}\r\n'.format(day, month, year),
                'responseFormat': 'Done\r\n'}
-        print('write date ', cmd_setdate)
+        # print('write date ', cmd_setdate)
         self.msgQueue.put(cmd_setdate)
 
     def getTime(self, event):
@@ -181,7 +183,7 @@ class Configurator_MK201(ConfiguratorGUI):
         sec = parentWidget.secondTextCtl.GetLineText(0)
         cmd_setdate = {'str': 'settime: {0} {1} {2}\r\n'.format(hour, min, sec),
                'responseFormat': 'Done\r\n'}
-        print('write date ', cmd_setdate)
+        # print('write date ', cmd_setdate)
         self.msgQueue.put(cmd_setdate)
 
     def updateDisplay(self, msg):
@@ -194,7 +196,7 @@ class Configurator_MK201(ConfiguratorGUI):
         result = data[u'result']
         result_list = data[u'result'].split()
         # print('data', data)
-        # print('result answer', data[u'result'])
+        # # print('result answer', data[u'result'])
         if u"cfg" in result:
             if (len(result_list) == 4):
                 baud = result_list[1]
@@ -207,7 +209,7 @@ class Configurator_MK201(ConfiguratorGUI):
         if (u"mode" in result) and not('getcommode' in result):
             if (len(result_list) == 2):
                 modbus = result_list[1]
-                print(modbus)
+                # print(modbus)
                 widgetGroup = getattr(self, "comWidget_" + comNum)
                 widgetGroup.modbusCombobox.SetStringSelection(modbusSetting_list[modbus])
         if u'adr' in result:
@@ -221,16 +223,16 @@ class Configurator_MK201(ConfiguratorGUI):
                 widgetGroup = getattr(self, "ipWidget")
                 resAddres = result[4:].replace(' ', '.')
                 resAddres = resAddres.replace('\r\n', '')
-                print('resAddres', str(resAddres))
+                # print('resAddres', str(resAddres))
                 widgetGroup.addressTextCtl.Clear()
                 widgetGroup.addressTextCtl.SetValue(resAddres)
         if u'mask' in result:
             if (len(result_list) == 5):
-                print('result_list', result_list)
+                # print('result_list', result_list)
                 widgetGroup = getattr(self, "maskWidget")
                 resAddres = result[6:].replace(' ', '.')
                 resAddres = resAddres.replace('\r\n', '')
-                print('mask ', resAddres )
+                # print('mask ', resAddres )
                 widgetGroup.addressTextCtl.Clear()
                 widgetGroup.addressTextCtl.SetValue(resAddres)
         if u'gateway' in result:
@@ -238,7 +240,7 @@ class Configurator_MK201(ConfiguratorGUI):
                 widgetGroup = getattr(self, "gatewayWidget")
                 resAddres = result[9:].replace(' ', '.')
                 resAddres = resAddres.replace('\r\n', '')
-                print('gateway ', resAddres )
+                # print('gateway ', resAddres )
                 widgetGroup.addressTextCtl.Clear()
                 widgetGroup.addressTextCtl.SetValue(resAddres)
         if u'date' in result:
@@ -255,7 +257,7 @@ class Configurator_MK201(ConfiguratorGUI):
                 widgetGroup.yearTextCtl.write(month)
         if u'time' in result:
             if (len(result_list) == 4):
-                print(result)
+                # print(result)
                 hour = result_list[1]
                 min = result_list[2]
                 sec = result_list[3]
@@ -266,11 +268,14 @@ class Configurator_MK201(ConfiguratorGUI):
                 widgetGroup.minuteTextCtl.write(min)
                 widgetGroup.secondTextCtl.Clear()
                 widgetGroup.secondTextCtl.write(sec)
+        if u'Error:' in result:
+            # print 'Lost connection'
+            self.OnClose(1)
 
     def OnClose(self, event):
         self.serialTread.stopThread()
         # self.modulObj.serial.close()
-        print('Stoped')
+        print('Plugin stoped')
         self.Destroy()
 
 if __name__ == '__main__':
