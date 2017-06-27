@@ -15,7 +15,7 @@ sys.path.append(_beremiz_folder)
 from Beremiz import BeremizIDELauncher
 
 
-class MK200Beremiz (BeremizIDELauncher):
+class MK200Beremiz(BeremizIDELauncher):
     def __init__(self):
         BeremizIDELauncher.__init__(self)
         splashPath = os.path.dirname(os.path.realpath(__file__))
@@ -61,6 +61,13 @@ class MK200Beremiz (BeremizIDELauncher):
                     os.mkdir(sourceDir)
             return rez
         BeremizIDE.ProjectController.NewProject = NewProjectWrapper
+        # PC = BeremizIDE.ProjectController
+        #
+        # BeremizIDE.ProjectController.IDEFrame.ConnectionStatusBar.SetStatusText(
+        #     _("Connected to URI: %s") % self.BeremizRoot.getURI_location().strip(), 1)
+        # PC.AppFrame.ConnectionStatusBar.SetStatusText(self.GetTextStatus(status), 2)
+        # a = Beremiz.IDEFrame.
+    # def .AppFrame.ConnectionStatusBar.SetStatusText('kek', 2)
 
 
 if __name__ == '__main__':
