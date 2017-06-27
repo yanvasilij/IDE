@@ -47,7 +47,7 @@ class comLabels(wx.Panel):
         self.portLbl = wx.StaticText(self, label = u"Порт", size = TEXT_WIDGET_SIZE)
         self.parityLbl = wx.StaticText(self, label = u"Четность", size = PARITY_WIDGET_SIZE)
         self.baudLbl = wx.StaticText(self, label = u"Скорость", size = BAUD_WIDGET_SIZE)
-        self.databutsLbl = wx.StaticText(self, label = u"Data bytes", size = (40, 30))
+        self.databutsLbl = wx.StaticText(self, label = u"Стоп бит", size = (40, 30))
         self.mbCombobox = wx.StaticText(self, label = u"Настройка modbus", size = MBCOMBOX_WIDGET_SIZE)
         self.mbAddress = wx.StaticText(self, label = u"Адрес modbus", size = MBADDRESS_WIDGET_SIZE)
         self.btn = wx.StaticText(self, label = u"", size = BTN_SIZE)
