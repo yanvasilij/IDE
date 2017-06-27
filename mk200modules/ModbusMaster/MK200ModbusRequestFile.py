@@ -14,7 +14,6 @@ from MBPortConfigPanel import DEFAULT_CONFIG
 from MBRequestDataPanel import MASTER_OPTION
 import copy
 
-CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
 CodeFile = CodeFileTreeNode.CodeFile
 
 DATALEN_DIC = {"8": "USART_WordLength_8b", "9": "USART_WordLength_9b"}
@@ -27,6 +26,12 @@ class MK200ModbusRequestFile (CodeFile):
             "retrieveFunction", "publishFunction"]
 
     EditorType = MK200ModbusRequestEditor
+
+    def __init__(self):
+        old_xsd = CodeFileTreeNode.CODEFILE_XSD
+        CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
+        CodeFile.__init__(self)
+        CodeFileTreeNode.CODEFILE_XSD = old_xsd
 
     def GetVariableLocationHoldings(self):
         """Получить дерево переменных для холдингов"""
@@ -253,7 +258,7 @@ class MK200ModbusRequestFile (CodeFile):
                     requestStruct += "\t}\n"
             requestStruct += "};\n\n"
 
-            prototypes += "RequestType req_" + request["Name"] + ";\r\n"
+            prototypes += "extern RequestType req_" + request["Name"] + ";\r\n"
             requestStruct += "RequestType req_" + request["Name"] + " =\n{\n"
             requestStruct += "\t" + REQUEST_TYPES[request["Modbus type"]] + ",\n"
             requestStruct += "\tMBRequestSuccesfulyDone,\n"
