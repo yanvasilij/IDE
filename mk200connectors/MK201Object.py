@@ -27,7 +27,7 @@ class MK201Object():
         self.confnodesroot._callConfigurator = self._Configurator
         # перегружаю метод _Disconnect, чтобы выполнить свои дейсвтия
         self.confnodesroot._Disconnect = self.disconnect
-        # self.confnodesroot.UpdateMethodsFromPLCStatus = self.UpdateMethodsFromPLCStatus
+        self.confnodesroot.CloseProject = self._closeProject
         # в список объектов toolBar-а добавляю вызов конфигуратора
         self.StatusMethods.append({"bitmap" : "configurator",
                                    "shown" : False,
@@ -56,6 +56,13 @@ class MK201Object():
         self.SerialConnection.serial.close()
         self.confnodesroot.ShowMethod('_callConfigurator', False)
         self.confnodesroot._SetConnector(None)
+
+    def _closeProject(self):
+        self.disconnect()
+        self.confnodesroot.ClearChildren()
+        self.confnodesroot.ResetAppFrame(None)
+
+
 
     def dialogMessage(self, message):
         dialog = wx.MessageBox(message, u'Ошибка!', wx.OK | wx.ICON_INFORMATION)
@@ -133,6 +140,9 @@ class MK201Object():
     def GetLogMessage(self, level, msgid):
         return None
 
+    def __del__(self):
+        print "__del__ of connector"
+
 class loadDilog(wx.Dialog):
     def __init__(self, parent, hexFilePath, port, moduleObject):
         self.downloadStatus = False
@@ -164,6 +174,7 @@ class loadDilog(wx.Dialog):
 
     def loadStatus(self, msg):
         answer = msg.data
+        # FIXME: почему-та иногда падает на этом месте, wx ругается на то что объект был удален
         if (type(answer) == int):
             self.progressBar.SetValue((answer - 1) * 10)
             self.statusBar.SetStatusText(str( (answer - 1)*10) + '%')
@@ -181,3 +192,4 @@ class loadDilog(wx.Dialog):
             # print(downloadStatusMsg)
             self.downloadStatus = True
             self.Destroy()
+
