@@ -24,7 +24,6 @@ from MK201FreqInCodeGenerator import MK201FreqInCodeGenerator
 from MK201RTCCodeGenerator import MK201RTCCodeGenerator
 from MK201_XSD import CODEFILE_XSD
 
-CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
 CodeFile = CodeFileTreeNode.CodeFile
 
 DIV_BEGIN = "/" + ("*"*82) + "\n\t\t\t"
@@ -97,6 +96,12 @@ class MK201ModuleFile (CodeFile):
     SECTIONS_NAMES = [ "includes", "globals", "initFunction", "cleanUpFunction", "retrieveFunction", "publishFunction"]
 
     EditorType = MK201FileEditor
+
+    def __init__(self):
+        old_xsd = CodeFileTreeNode.CODEFILE_XSD
+        CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
+        CodeFile.__init__(self)
+        CodeFileTreeNode.CODEFILE_XSD = old_xsd
 
     def GetIoVariableLocationTree(self, name, type, location, size, numOfChannles):
         variableTree = {"name": name, "type": LOCATION_GROUP, "location": "0", "children": []}
@@ -213,6 +218,7 @@ class MK201ModuleFile (CodeFile):
         self.DoCodeGenerator = MK201DoCodeGenerator(self)
         self.RTCCodeGenerator = MK201RTCCodeGenerator(self)
 
+        text += "#include \"MK201_IO.h\"\n"
         text += self.AiCodeGenerator.GenerateVars()
         text += self.AoCodeGenerator.GenerateVars()
         text += self.FreqInCodeGenerator.GenerateVars()

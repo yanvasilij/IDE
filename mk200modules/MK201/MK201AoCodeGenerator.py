@@ -21,8 +21,6 @@ class MK201AoCodeGenerator(MK201IOCodeGenerator):
         iecChannel = self.Controller.GetFullIEC_Channel()[:1]
         text = ""
         text += DIV_BEGIN + "AO" + DIV_END
-        text += "extern float onBoardAoCurrents[2];\n"
-        text += "extern unsigned char onBoardAoEnable[2];\n"
         for i in range(0, NUM_OF_AO):
             text += "float *" + "__QD" + iecChannel + "_1_{0} = &onBoardAoCurrents[{1}];\n".format(i,i)
         return text

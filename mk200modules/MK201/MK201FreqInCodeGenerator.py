@@ -24,16 +24,12 @@ class MK201FreqInCodeGenerator(MK201IOCodeGenerator):
         iecChannel = self.Controller.GetFullIEC_Channel()[:1]
         text = ""
         text += DIV_BEGIN + "Frq in" + DIV_END
-        text += "extern unsigned char onBoardFrqInMode[{}];\n".format(NUM_OF_FRQ_IN)
-        text += "extern unsigned char onBoardCounterRun[{}];\n".format(NUM_OF_FRQ_IN)
-        text += "extern unsigned int onBoardCounter[{}];\n".format(NUM_OF_FRQ_IN)
-        text += "extern float onBoardFrequency[{}];\n".format(NUM_OF_FRQ_IN)
 
         for i in range(0, (NUM_OF_FRQ_IN)):
-            text += "unsigned char *" + "__QB" + iecChannel + "_2_0_{0} = &onBoardFrqInMode[{1}];\n".format(i,i)
+            text += "u8 *" + "__QB" + iecChannel + "_2_0_{0} = &onBoardFrqInMode[{1}];\n".format(i,i)
             text += "float *" + "__QD" + iecChannel + "_2_1_{0} = &onBoardFrequency[{1}];\n".format(i,i)
-            text += "unsigned char *" + "__QX" + iecChannel + "_2_2_{0} = &onBoardCounterRun[{1}];\n".format(i,i)
-            text += "unsigned int *" + "__QD" + iecChannel + "_2_3_{0} = &onBoardCounter[{1}];\n\n".format(i,i)
+            text += "u8 *" + "__QX" + iecChannel + "_2_2_{0} = &onBoardCounterRun[{1}];\n".format(i,i)
+            text += "u32 *" + "__QD" + iecChannel + "_2_3_{0} = &onBoardCounter[{1}];\n\n".format(i,i)
         return text
 
     def GenerateInit(self):

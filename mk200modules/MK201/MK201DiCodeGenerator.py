@@ -21,8 +21,6 @@ class MK201DiCodeGenerator(MK201IOCodeGenerator):
         iecChannel = self.Controller.GetFullIEC_Channel()[:1]
         text = ""
         text += DIV_BEGIN + "DI" + DIV_END
-	text += "extern unsigned char onBoardDiEnabled[{}];\n".format(NUM_OF_ON_BOARD_DI)
-	text += "extern unsigned char onBoardDiValue[{}];\n".format(NUM_OF_ON_BOARD_DI)
 
         for i in range(0, (NUM_OF_ON_BOARD_DI)):
             text += "unsigned char *" + "__QX" + iecChannel + "_3_{0} = &onBoardDiValue[{1}];\n".format(i,i)

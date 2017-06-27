@@ -20,8 +20,6 @@ class MK201AiCodeGenerator(MK201IOCodeGenerator):
         """
         iecChannel = self.Controller.GetFullIEC_Channel()[:1]
         text = DIV_BEGIN + "AI" + DIV_END
-        text += "extern float onBoardAiCurrent[8];\n"
-        text += "extern float onBoardAiEnabled[8];\n"
         for i in range(0, NUM_OF_AI):
             text += "float *" + "__QD" + iecChannel + "_0_{0} = &onBoardAiCurrent[{1}];\n".format(i,i)
         return text
