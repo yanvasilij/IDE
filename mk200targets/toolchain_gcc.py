@@ -146,6 +146,12 @@ class toolchain_gcc():
 
                         self.CTRInstance.logger.write("   [CC]  "+bn+" -> "+obn+"\n")
 
+                        # Add -std=c99 option for c-files, and remove it from .cpp if exist
+                        if CFile.endswith(".c"):
+                            Builder_CFLAGS += " -std=c99 "
+                        else:
+                            Builder_CFLAGS = Builder_CFLAGS.replace("-std=c99", "")
+
                         status, result, err_result = ProcessLogger(
                                self.CTRInstance.logger,
                                "\"%s\" -c \"%s\" -o \"%s\" %s %s"%

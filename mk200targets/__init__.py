@@ -40,15 +40,20 @@ class MKLogik200_target(toolchain_gcc):
         return additionalobjects + toolchain_gcc.getBuilderLDFLAGS(self) + stm32_ldflags + ldscript# + ["-shared"]
 
     def getBuilderCFLAGS(self):
-        includePathes = [r'-I ' + "\"" + os.path.dirname(os.path.realpath(__file__)) + r'\..\..\beremizStm32Port\inc' + "\""]
+        base_folder = os.path.dirname(os.path.realpath(__file__)) + r'\..\..'
+        includePathes = [r'-I ' + "\"" + base_folder + r'\beremizStm32Port\inc' + "\""]
+        """ Adding matiec\lib\C\ """
+        includePathes.append(r'-I' + "\"" + base_folder +r'\matiec\lib\C' + "\"")
         """ Adding folder ./inc and ./src to include pathes """
         additionincludepath = os.path.split(self.exe_path)[0]
         additionincludepath = os.path.split(additionincludepath)[0]
         incFolder = os.path.join(additionincludepath, "inc")
         srcFolder = os.path.join(additionincludepath, "src")
+        buildFolder = os.path.join(additionincludepath, "build")
         includePathes.append(r'-I' + "\"" + incFolder + "\"")
         includePathes.append(r'-I' + "\"" + srcFolder + "\"")
-        stm32_cflags = self.getSTM32Config("cflags") + ["-std=c99"] + includePathes
+        includePathes.append(r'-I' + "\"" + buildFolder + "\"")
+        stm32_cflags = self.getSTM32Config("cflags") + includePathes
         return toolchain_gcc.getBuilderCFLAGS(self) + stm32_cflags # + ["-fPIC"]
 
     @staticmethod
