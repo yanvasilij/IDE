@@ -8,7 +8,7 @@
                 productVersion="1"
                 creationDateTime="2013-01-29T14:01:00"/>
     <contentHeader name="Unnamed"
-                   modificationDateTime="2013-02-26T15:59:13">
+                   modificationDateTime="2017-06-08T15:59:13">
         <coordinateInfo>
             <fbd>
                 <scaling x="0" y="0"/>
@@ -23,7 +23,49 @@
     </contentHeader>
     <types>
         <pous>
-            <pou name="WORD_TO_MB_HOLDING" pouType="function">
+            <pou name="SET_HOLDING_REAL" pouType="function" >
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="IN_REAL">
+                            <type>
+                                <REAL/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                    <![CDATA[
+                     {{
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setU16Holding (u32 adr, u16 value);
+                     u32 value = *(u32 *)(&IN_REAL);
+                     u16 high = value;
+                     u16 low = value >> 16;
+                     SET_HOLDING_REAL = setU16Holding(ADDR, high);
+                     SET_HOLDING_REAL = setU16Holding(ADDR + 1, low);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Set input REAL type variable in modbus holding registers]]></xhtml:p>
+                </documentation>
+            </pou>
+            <pou name="SET_HOLDING_WORD" pouType="function" >
                 <interface>
                     <returnType>
                         <INT/>
@@ -52,13 +94,93 @@
                      typedef uint16_t u16;
                      typedef uint8_t u8;
                      extern u8 setU16Holding (u32 adr, u16 value);
-                     WORD_TO_MB_HOLDING = setU16Holding(ADDR, IN_WORD);
+                     SET_HOLDING_WORD = setU16Holding(ADDR, IN_WORD);
                      }}
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Set input WORD type variable in modbus holding register]]></xhtml:p>
+                </documentation>
             </pou>
-            <pou name="MB_HOLDING_TO_WORD" pouType="function">
+            <pou name="SET_LONG" pouType="function" >
+                <interface>
+                    <returnType>
+                        <INT/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <INT/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                    <inputVars>
+                        <variable name="IN_DWORD">
+                            <type>
+                                <DWORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                    <![CDATA[
+                     {{
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u8 setU16Holding (u32 adr, u16 value);
+                     u16 high = IN_DWORD;
+                     u16 low = IN_DWORD >> 16;
+                     SET_LONG = setU16Holding(ADDR, IN_DWORD);
+                     SET_LONG = setU16Holding(ADDR + 1, (IN_DWORD >> 16));
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Set input WORD type variable in modbus holding register]]></xhtml:p>
+                </documentation>
+            </pou>
+            <pou name="GET_HOLDING_REAL" pouType="function">
+                <interface>
+                    <returnType>
+                        <REAL/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u16 getU16Holding (u32 adr);
+                     u16 higth, low;
+                     u32 value;
+                     low = getU16Holding(ADDR);
+                     higth = getU16Holding(ADDR + 1);
+                     value = (higth<< 16) | (low);
+                     GET_HOLDING_REAL = *(float *)(& value);
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Return REAL type variable from modbus holding registers]]></xhtml:p>
+                </documentation>
+            </pou>
+            <pou name="GET_HOLDING_WORD" pouType="function">
                 <interface>
                     <returnType>
                         <WORD/>
@@ -80,13 +202,16 @@
                      typedef uint16_t u16;
                      typedef uint8_t u8;
                      extern u16 getU16Holding (u32 adr);
-                     MB_HOLDING_TO_WORD = getU16Holding(ADDR);
+                     GET_HOLDING_WORD = getU16Holding(ADDR);
                      }}
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Return WORD type variable from modbus holding register]]></xhtml:p>
+                </documentation>
             </pou>
-            <pou name="WORD_TO_MB_INPUT" pouType="function">
+            <pou name="SET_INPUT_WORD" pouType="function">
                 <interface>
                     <returnType>
                         <INT/>
@@ -115,13 +240,16 @@
                      typedef uint16_t u16;
                      typedef uint8_t u8;
                      extern u8 setU16Input(u32 adr, u16 value);
-                     WORD_TO_MB_INPUT = setU16Input(ADDR, IN_WORD);
+                     SET_INPUT_WORD = setU16Input(ADDR, IN_WORD);
                      }}
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Set input WORD type variable in modbus input register]]></xhtml:p>
+                </documentation>
             </pou>
-            <pou name="MB_INPUT_TO_WORD" pouType="function">
+            <pou name="GET_INPUT_WORD" pouType="function">
                 <interface>
                     <returnType>
                         <WORD/>
@@ -143,11 +271,14 @@
                      typedef uint16_t u16;
                      typedef uint8_t u8;
                      extern u16 getU16Input (u32 adr);
-                     MB_INPUT_TO_WORD = getU16Input(ADDR);
+                     GET_INPUT_WORD = getU16Input(ADDR);
                      }}
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Return WORD type variable from modbus input register]]></xhtml:p>
+                </documentation>
             </pou>
             <pou name="SET_COIL" pouType="function">
                 <interface>
@@ -183,6 +314,9 @@
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Set input WORD type variable in modbus coil register]]></xhtml:p>
+                </documentation>
             </pou>
             <pou name="GET_COIL" pouType="function">
                 <interface>
@@ -246,6 +380,9 @@
                     ]]>
                     </ST>
                 </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Return BOOL type variable from modbus input register]]></xhtml:p>
+                </documentation>
             </pou>
             <pou name="GET_DISC" pouType="function">
                 <interface>
