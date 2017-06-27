@@ -8,7 +8,7 @@
 from mk200modules.MK200CANOpen.CANOpenIOEditors.CANOpenIOEditor import *
 
 FREQIN_MODES = ("Off", "Counter", "Frequency")
-NUM_OF_FRQ_IN = 4
+NUM_OF_FRQ_IN = 8
 DESCRIPTION = "On board freq in"
 
 class CANOpenFreqInChannelEditor(wx.Panel):
@@ -20,6 +20,7 @@ class CANOpenFreqInChannelEditor(wx.Panel):
         self.channelTxt = wx.StaticText(self, label="Input #{}".format(channel))
         newId = wx.NewId()
         self.modeCmbbx = wx.ComboBox(self, id=newId, value="Select mode", choices=FREQIN_MODES)
+        self.modeCmbbx.SetStringSelection(FREQIN_MODES[1])
         main_sizer.Add(self.channelTxt, flag=wx.ALIGN_CENTER_VERTICAL)
         main_sizer.Add(self.modeCmbbx, flag=wx.ALIGN_CENTER_VERTICAL)
 
@@ -32,9 +33,11 @@ class CANOpenFreqInEditor(CANOpenIOEditor):
 
         """ Настройки по умолчанию для частоных/счетных входов """
         self.DefaultConfig = []
+        self.cobeID = self.Controler.GetFullIEC_Channel()
+        self.cobeID = self.cobeID[:-2].replace('.', '_')
         for i in range(0, NUM_OF_FRQ_IN):
             self.DefaultConfig.append({
-                "Name" : "MK200_FrqIn{}".format(i),
+                "Name" : "MK200_FrqIn_{0}_{1}".format(self.cobeID, i),
                 "Address" : "",
                 "Len" : "",
                 "Type" : u"REAL",
@@ -51,7 +54,7 @@ class CANOpenFreqInEditor(CANOpenIOEditor):
         main_sizer.Add(self.title, flag=wx.ALIGN_CENTER_VERTICAL)
 
         self.inputs = []
-        for i in range(0,4):
+        for i in range(0,NUM_OF_FRQ_IN):
             channel = CANOpenFreqInChannelEditor(self, i)
             wx.EVT_COMBOBOX(self, channel.modeCmbbx.GetId(), self.OnChange)
             self.inputs.append(channel)

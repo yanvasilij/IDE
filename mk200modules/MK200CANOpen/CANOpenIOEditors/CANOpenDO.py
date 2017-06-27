@@ -7,7 +7,7 @@
 
 from mk200modules.MK200CANOpen.CANOpenIOEditors.CANOpenIOEditor import *
 
-NUM_OF_ON_BOARD_DO = 16
+NUM_OF_ON_BOARD_DO = 8
 DESCRIPTION = "On board digital outputs"
 
 class CANOpenDoChannelEditor(wx.Panel):
@@ -18,6 +18,7 @@ class CANOpenDoChannelEditor(wx.Panel):
 
         chkBxId = wx.NewId()
         self.isOnChkbx = wx.CheckBox(self, label="Enable channel #{}".format(channel), id=chkBxId)
+        self.isOnChkbx.SetValue(True)
         main_sizer.Add(self.isOnChkbx, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(main_sizer)
 
@@ -26,9 +27,11 @@ class CANOpenDoEditor(CANOpenIOEditor):
         CANOpenIOEditor.__init__ (self, parent, window, controler)
         """ Настройки по умолчанию для частоных/счетных входов """
         self.DefaultConfig = []
+        self.cobeID = self.Controler.GetFullIEC_Channel()
+        self.cobeID = self.cobeID[:-2].replace('.', '_')
         for i in range(0, NUM_OF_ON_BOARD_DO):
             self.DefaultConfig.append({
-                "Name" : "MK200_DO_{}".format(i),
+                "Name" : "MK200_DO_{0}_{1}".format(self.cobeID, i),
                 "Address" : "",
                 "Len" : "",
                 "Type" : u"BOOL",
@@ -45,7 +48,7 @@ class CANOpenDoEditor(CANOpenIOEditor):
         main_sizer.Add(self.title, flag=wx.ALIGN_CENTER_VERTICAL)
 
         self.inputs = []
-        for i in range(0,16):
+        for i in range(0, NUM_OF_ON_BOARD_DO):
             channel = CANOpenDoChannelEditor(self, i)
             wx.EVT_CHECKBOX(self, channel.isOnChkbx.GetId(), self.OnChange)
             self.inputs.append(channel)
@@ -66,7 +69,7 @@ class CANOpenDoEditor(CANOpenIOEditor):
         в виде списка словарей
         """
         config = self.DefaultConfig[:]
-        for channel, chConfig  in zip(self.inputs, config):
+        for channel, chConfig in zip(self.inputs, config):
             if channel.isOnChkbx.GetValue():
                 chConfig["Options"] = "On"
             else:

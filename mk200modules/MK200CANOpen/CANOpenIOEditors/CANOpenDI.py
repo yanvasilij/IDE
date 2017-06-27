@@ -24,6 +24,7 @@ class CANOpenDiChannelEditor(wx.Panel):
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         chkBxId = wx.NewId()
         self.isOnChkbx = wx.CheckBox(self, label="Enable channel #{}".format(channel), id=chkBxId)
+        self.isOnChkbx.SetValue(True)
         main_sizer.Add(self.isOnChkbx, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(main_sizer)
 
@@ -34,9 +35,11 @@ class CANOpenDiEditor(CANOpenIOEditor):
         self.channelNum = channelNum
         """ Настройки по умолчанию для частоных/счетных входов """
         self.DefaultConfig = []
+        self.cobeID = self.Controler.GetFullIEC_Channel()
+        self.cobeID = self.cobeID[:-2].replace('.', '_')
         for i in range(0, channelNum):
             self.DefaultConfig.append({
-                "Name" : "MK200_DI_{}".format(i),
+                "Name" : "MK200_DI_{0}_{1}".format(self.cobeID, i),
                 "Address" : "",
                 "Len" : "",
                 "Type" : u"BOOL",

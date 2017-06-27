@@ -6,15 +6,22 @@
 """
 
 import wx
-import os
-import wx.lib.agw.customtreectrl as CT
 import CodeFileTreeNode
-from editors.CodeFileEditor import CodeEditor
+
+from MK201CANOpen_XSD import CODEFILE_XSD
 from editors.CodeFileEditor import CodeFileEditor
 from editors.ConfTreeNodeEditor import ConfTreeNodeEditor
-from ConfigTreeNode import ConfigTreeNode
-from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 from CANOpenIOEditors.CANOpenNodeID import NodeId
+
+CodeFile = CodeFileTreeNode.CodeFile
+
+
+class MK200CANOpenFile(CodeFile):
+    def __init__(self):
+        old_xsd = CodeFileTreeNode.CODEFILE_XSD
+        CodeFileTreeNode.CODEFILE_XSD = CODEFILE_XSD
+        CodeFile.__init__(self)
+        CodeFileTreeNode.CODEFILE_XSD = old_xsd
 
 
 class MK200CANOpenBase(CodeFileEditor):

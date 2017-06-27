@@ -12,6 +12,7 @@ from ConfigTreeNode import ConfigTreeNode
 from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 
 DESCRIPTION = "Node ID"
+TEAXLABEL_SIZE = (120, 21)
 
 class NodeId(wx.Panel):
     def __init__(self, parent, window, controler):
@@ -22,23 +23,26 @@ class NodeId(wx.Panel):
         self.Controler = controler
 
         self.DefaultConfig = []
+        self.cobeID = self.Controler.GetFullIEC_Channel()
+        self.cobeID = self.cobeID[:-2].replace('.', '_')
         self.DefaultConfig.append({
-            "Name" : "Node_ID",
-            "Address" : "1",
+            "Name" : "Node_ID_{}".format(self.cobeID),
+            "Address" : "127",
             "Len" : "",
             "Type" : u"INT",
             "Initial": "",
             "Description": DESCRIPTION,
             "OnChange":"",
+            "Value":"",
             "Options":""})
 
-        nodeIDsizer = wx.BoxSizer(wx.HORIZONTAL)
-        nodeIDText = wx.StaticText(self, label = 'Node ID')
-        nodeIDsizer.Add(nodeIDText, wx.ALIGN_CENTER_VERTICAL)
-        self.nodeID = wx.lib.intctrl.IntCtrl(self, value=1, min=1, max=127, limited=True)
+        self.nodeIDsizer = wx.BoxSizer(wx.HORIZONTAL)
+        nodeIDLbl = wx.StaticText(self, label='Node ID', size=TEAXLABEL_SIZE)
+        self.nodeIDsizer.Add(nodeIDLbl, wx.ALIGN_CENTER_VERTICAL)
+        self.nodeID = wx.lib.intctrl.IntCtrl(self, value=127, min=0, max=127, limited=True)
         wx.EVT_TEXT(self, self.nodeID.GetId(), self.OnChange)
-        nodeIDsizer.Add(self.nodeID)
-        self.SetSizer(nodeIDsizer)
+        self.nodeIDsizer.Add(self.nodeID)
+        self.SetSizer(self.nodeIDsizer)
 
     def GetData(self):
         config = self.DefaultConfig[:]
@@ -49,7 +53,7 @@ class NodeId(wx.Panel):
     def SetData(self, nodeConfig):
         self.RefreshModel()
         if len(nodeConfig) == 0:
-            self.nodeID.SetValue(1)
+            self.nodeID.SetValue(127)
         else:
             self.nodeID.SetValue(int(nodeConfig[0]["Address"]))
 

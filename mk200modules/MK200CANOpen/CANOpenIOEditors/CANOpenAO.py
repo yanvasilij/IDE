@@ -9,6 +9,7 @@ from mk200modules.MK200CANOpen.CANOpenIOEditors.CANOpenIOEditor import *
 
 AO_MODES = ("Off", "4-20mA", "0-20mA")
 NUM_OF_AO = 2
+DESCRIPTION = "On board AO"
 
 class CANOpenAoChannelEditor(wx.Panel):
 
@@ -19,6 +20,7 @@ class CANOpenAoChannelEditor(wx.Panel):
         self.channelTxt = wx.StaticText(self, label="Output #{}".format(channel))
         newId = wx.NewId()
         self.modeCmbbx = wx.ComboBox(self, id=newId, value="SelectRange", choices=AO_MODES)
+        self.modeCmbbx.SetStringSelection(AO_MODES[2])
         main_sizer.Add(self.channelTxt, flag=wx.ALIGN_CENTER_VERTICAL)
         main_sizer.Add(self.modeCmbbx, flag=wx.ALIGN_CENTER_VERTICAL)
         self.SetSizer(main_sizer)
@@ -31,14 +33,16 @@ class CANOpenAoutputEditor(wx.Panel):
         self.Controler = controler
 
         self.DefaultConfig = []
+        self.cobeID = self.Controler.GetFullIEC_Channel()
+        self.cobeID = self.cobeID[:-2].replace('.', '_')
         for i in range(0, NUM_OF_AO):
             self.DefaultConfig.append({
-                "Name" : "MK200_AO_{}".format(i),
+                "Name" : "MK200_AO_{0}_{1}".format(self.cobeID, i),
                 "Address" : "",
                 "Len" : "",
                 "Type" : u"REAL",
                 "Initial": "",
-                "Description": "On board AO",
+                "Description": DESCRIPTION,
                 "OnChange":"",
                 "Options":"4-20mA"})
 
@@ -63,7 +67,7 @@ class CANOpenAoutputEditor(wx.Panel):
     def OnChange(self, event):
         valuesOnFrame = self.GetData()
         valuesInController = [i for i in self.Controler.GetVariables()
-                              if i["Description"] == "On board AO"]
+                              if i["Description"] == DESCRIPTION]
         if valuesOnFrame != valuesInController:
             self.RefreshModel()
         event.Skip()
@@ -106,7 +110,7 @@ class CANOpenAoutputEditor(wx.Panel):
 
     def RefreshModel(self):
         controllerVariables = self.Controler.GetVariables()
-        controllerVariables = [i for i in controllerVariables if i["Description"] != "On board AO"]
+        controllerVariables = [i for i in controllerVariables if i["Description"] != DESCRIPTION]
         controllerVariables += self.GetData()
         self.Controler.SetVariables(controllerVariables)
         self.RefreshBuffer()
@@ -120,7 +124,7 @@ class CANOpenAoutputEditor(wx.Panel):
 
     def RefreshView(self):
         varForTable = self.Controler.GetVariables()
-        varForTable = [i for i in varForTable if i["Description"] == "On board AO"]
+        varForTable = [i for i in varForTable if i["Description"] == DESCRIPTION]
         self.SetData(varForTable)
         self.Layout()
 

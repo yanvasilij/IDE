@@ -7,22 +7,20 @@
 
 import wx
 import os
-import wx.lib.agw.customtreectrl as CT
 import CodeFileTreeNode
 from editors.CodeFileEditor import CodeEditor
-from editors.CodeFileEditor import CodeFileEditor
 from editors.ConfTreeNodeEditor import ConfTreeNodeEditor
-from ConfigTreeNode import ConfigTreeNode
 from PLCControler import LOCATION_CONFNODE, LOCATION_GROUP, LOCATION_VAR_MEMORY
 from CANOpenIOEditors.CANOpenFreqIn import CANOpenFreqInEditor
-from MK200CANOpenBase import MK200CANOpenBase
-
-CodeFile = CodeFileTreeNode.CodeFile
+from MK200CANOpenBase import MK200CANOpenBase, MK200CANOpenFile
 
 DIV_BEGIN = "/" + ("*"*82) + "\n\t\t\t"
 DIV_END = "\n" + ("*"*82) + "/\n"
-NUM_OF_FRQ_IN = 4
+NUM_OF_FRQ_IN = 8
 LOACTION_MODULE_NUM = '.3'
+NODE_ID_DESCRIPTION = "Node ID"
+FREQ_DESCRIPTION = "On board freq in"
+
 
 class MK245CANOpenEditor(CodeEditor):
 
@@ -70,7 +68,7 @@ class MK245CANOpenFileEditor(MK200CANOpenBase):
         self.freqEditor.RefreshView()
 
 
-class MK245CANOpenFile (CodeFile):
+class MK245CANOpenFile (MK200CANOpenFile):
 
     CODEFILE_NAME = "CANOpenConfig"
     SECTIONS_NAMES = [ "includes", "globals", "initFunction", "cleanUpFunction", "retrieveFunction", "publishFunction"]
@@ -91,13 +89,36 @@ class MK245CANOpenFile (CodeFile):
                 'size':  size})
         return variableTree
 
+    def GetDiagnosticVariableLocationTree(self, location):
+        variableTree = {"name": "Diagnostic", "type": LOCATION_GROUP, "location": "0", "children": []}
+        variableTree["children"].append({
+                'children':[],
+                'var_name': 'Connected',
+                'IEC_type': u'BOOL',
+                'name': 'Connected',
+                'description': '',
+                'type': LOCATION_VAR_MEMORY,
+                'location': '%QX'+location+'.{}'.format(0),
+                'size':  'X'})
+        variableTree["children"].append({
+                'children':[],
+                'var_name': 'Error',
+                'IEC_type': u'DINT',
+                'name': 'Error',
+                'description': '',
+                'type': LOCATION_VAR_MEMORY,
+                'location': '%QD'+location+'.{}'.format(1),
+                'size':  'D'})
+        return variableTree
+
     def GetVariableLocationTree(self):
-        iecChannel = self.GetFullIEC_Channel()[:1]
-        frequncyMode = self.GetIoVariableLocationTree("Mode", u'BYTE', '%QB'+iecChannel+LOACTION_MODULE_NUM+'.0', 'B', NUM_OF_FRQ_IN)
-        frequncyValue = self.GetIoVariableLocationTree("Frequncy", u'REAL', '%QD'+iecChannel+LOACTION_MODULE_NUM+'.1', 'D', NUM_OF_FRQ_IN)
-        counterStart = self.GetIoVariableLocationTree("Counter start", u'BOOL', '%QX'+iecChannel+LOACTION_MODULE_NUM+'.2', 'X', NUM_OF_FRQ_IN)
-        counterValue = self.GetIoVariableLocationTree("Counter value", u'DINT', '%QD'+iecChannel+LOACTION_MODULE_NUM+'.3', 'D', NUM_OF_FRQ_IN)
-        frqInChildren = [frequncyMode, frequncyValue, counterStart, counterValue]
+        current_location = self.GetCurrentLocation()
+        iecChannel = ".".join(map(str, current_location))
+        frequncyMode = self.GetIoVariableLocationTree("Mode", u'DINT', '%QD'+iecChannel+'.0', 'D', NUM_OF_FRQ_IN)
+        frequncyValue = self.GetIoVariableLocationTree("Counter value", u'DINT', '%QD'+iecChannel+'.1', 'D', NUM_OF_FRQ_IN)
+        counterValue = self.GetIoVariableLocationTree("Frequncy value", u'REAL', '%QD'+iecChannel+'.2', 'D', NUM_OF_FRQ_IN)
+        diagnostic = self.GetDiagnosticVariableLocationTree(iecChannel+'.3')
+        frqInChildren = [frequncyMode, frequncyValue, counterValue, diagnostic]
         freqInputs = {
                 "name": "Frequency/Counter inputs",
                 "type": LOCATION_CONFNODE,
@@ -113,8 +134,38 @@ class MK245CANOpenFile (CodeFile):
     def GetConfNodeGlobalInstances(self):
         return []
 
+    def GenerateDefaultVariables(self):
+        defaultConfig = []
+        cobeID = self.GetFullIEC_Channel()
+        cobeID = cobeID[:-2].replace('.', '_')
+        for i in range (0, NUM_OF_FRQ_IN):
+            defaultConfig.append({
+                "Name" : "MK200_FrqIn_{0}_{1}".format(cobeID, i),
+                "Address" : "",
+                "Len" : "",
+                "Type" : u"DINT",
+                "Initial": "",
+                "Description": "On board freq in",
+                "OnChange":"",
+                "Options":"Couter"})
+        defaultConfig.append({
+            "Name" : "Node_ID_{}".format(cobeID),
+            "Address" : "127",
+            "Len" : "",
+            "Type" : u"INT",
+            "Initial": "",
+            "Description": "Node ID",
+            "OnChange":"",
+            "Value":"",
+            "Options":""})
+        return defaultConfig
+
     def GetVariables(self):
         datas = []
+        codeFileVariables = self.CodeFileVariables(self.CodeFile)
+        if len(codeFileVariables) == 0:
+            datas = self.GenerateDefaultVariables()
+            return datas
         for var in self.CodeFileVariables(self.CodeFile):
             datas.append({"Name" : var.getname(),
                           "Type" : var.gettype(),
@@ -153,21 +204,87 @@ class MK245CANOpenFile (CodeFile):
     def CodeFileName(self):
         return os.path.join(self.CTNPath(), "MK245CANOpen.xml")
 
+    def GenerateLocationVariables(self, location_str):
+        """
+        Generates Locations vairables that binds user app variables and runtime
+        :param location_str: location of whole module in project three (e.g. 1,2,3...)
+        :return: C-code of declaring binding variables
+        """
+        text = ""
+        for i in range(NUM_OF_FRQ_IN):
+            text += "void *__QD{0}_1_{1} = &mk245_{2}.freqChannel[{3}].counterValue;\n".format(location_str,
+                                                                                  i, location_str, i)
+            text += "void *__QD{0}_2_{1} = &mk245_{2}.freqChannel[{3}].freqValue;\n".format(location_str,
+                                                                              i, location_str, i)
+        text += "static u8 connectionStatus=0;\n"
+        text += "void * __QX{}_3_0 = &connectionStatus;\n".format(location_str)
+        text += "void * __QD{0}_3_1 = &mk245_{1}.connectionsStatus;\n".format(location_str, location_str)
+        return text
+
+    def GenerateInit(self, location_str):
+        text = ""
+        text += "extern \"C\" int __init_%s(int argc,char **argv)\n"%location_str
+        text += "{\n"
+        ao_config = [i for i in self.GetVariables() if i["Description"] == FREQ_DESCRIPTION]
+        for config in ao_config:
+            channel = config["Name"][-1]
+            if config["Options"] == "Off":
+                text += "    mk245_{0}.freqChannel[{1}].mode = 0;\n".format(location_str, channel)
+            elif config["Options"] == "Frequency":
+                text += "    mk245_{0}.freqChannel[{1}].mode = 1;\n".format(location_str, channel)
+            elif config["Options"] == "Counter":
+                text += "    mk245_{0}.freqChannel[{1}].mode = 2;\n".format(location_str, channel)
+
+        text += "    mk200CANOpenMaster.addNode(&mk245_{0});\n".format(location_str)
+        text += "    return 0;\n"
+        text += "}\n"
+        return text
+
+    def GenerateRetrive(self, location_str):
+        """
+        Generate __retrieve_%s function
+        :param location_str: location of whole module in project three (e.g. 1,2,3...)
+        :return: C-Function code
+        """
+        text = ""
+        text += "extern \"C\" void __retrieve_%s(void)\n{\n"%location_str
+        text += "    if (mk245_%s.connectionsStatus == ConnectedAndInited)\n"%location_str
+        text += "    {\n"
+        text += "        connectionStatus = 1;\n"
+        text += "    }\n"
+        text += "    else\n"
+        text += "    {\n"
+        text += "        connectionStatus = 0;\n"
+        text += "    }\n"
+        text += "\n}\n\n"
+        return text
+
     def CTNGenerate_C(self, buildpath, locations):
 
         current_location = self.GetCurrentLocation()
         location_str = "_".join(map(str, current_location))
+        print 'location_str ', location_str
         text = ""
+        text += "#include \"MK200CANOpenMasterProcess.h\"\r\n"
+
+        node_id = [i["Address"] for i in self.GetVariables() if i["Description"] == NODE_ID_DESCRIPTION]
+        print node_id
+        if len(node_id) > 0:
+            node_id = node_id[0]
+        else:
+            node_id = 1
+
+        text += "CANOpenMK245 mk245_{0}({1});\r\n".format(location_str, node_id)
+
+        text += self.GenerateLocationVariables(location_str)
 
         text += DIV_BEGIN + "Publish and retrive" + DIV_END
-        text += "extern \"C\" int __init_%s(int argc,char **argv)\n{\n"%location_str
-        text += "  return 0;\n}\n\n"
+        text += self.GenerateInit(location_str)
 
         text += "extern \"C\" void __cleanup_%s(void)\n{\n"%location_str
         text += "\n}\n\n"
 
-        text += "extern \"C\" void __retrieve_%s(void)\n{\n"%location_str
-        text += "\n}\n\n"
+        text += self.GenerateRetrive(location_str)
 
         text += "extern \"C\" void __publish_%s(void)\n{\n"%location_str
         text += "\n"
@@ -179,4 +296,3 @@ class MK245CANOpenFile (CodeFile):
         cfile.close()
         matiec_flags = '"-I%s"'%os.path.abspath(self.GetCTRoot().GetIECLibPath())
         return [(Gen_Cfile_path, str(matiec_flags))],str(""), True
-
