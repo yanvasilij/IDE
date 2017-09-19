@@ -17,7 +17,7 @@ class SerialPort(object):
     def __init__(self):
         self.baud = 115200
         self.parity = serial.PARITY_NONE
-        self.timeout = 0.5
+        self.timeout = 0.01
         self.serial = serial.Serial()
         self.setSerialOptions()
         self.ConsoleCommandsQueue = Queue
@@ -66,7 +66,6 @@ class SerialPort(object):
             self.serial.readline()
             status = True
         except:
-            print 'hui'
             status = False
         return status
 
