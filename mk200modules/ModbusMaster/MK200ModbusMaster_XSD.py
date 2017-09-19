@@ -37,6 +37,7 @@ CODEFILE_XSD = """<?xml version="1.0" encoding="ISO-8859-1" ?>
                   <xsd:attribute name="devid" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="txtype" type="xsd:string" use="optional" default=""/>
                   <xsd:attribute name="period" type="xsd:string" use="optional" default=""/>
+                  <xsd:attribute name="timeout" type="xsd:string" use="optional" default=""/>
                 </xsd:complexType>
               </xsd:element>
             </xsd:sequence>

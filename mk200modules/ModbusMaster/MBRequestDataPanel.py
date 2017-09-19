@@ -55,7 +55,7 @@ class MBRequestDataTable (CustomTable):
     def __init__(self, parent):
         CustomTable.__init__(self, parent,
                 [], ["#", "Name", "Device ID", "Address", "Modbus type", "Data type",
-                    "Len", "Transfer method", "Period"])
+                    "Len", "Transfer method", "Period", "Timeout"])
 
     def _updateColAttrs(self, grid):
         content = self.GetData()
@@ -65,7 +65,7 @@ class MBRequestDataTable (CustomTable):
                 renderer = None
                 colname = self.GetColLabelValue(col, False)
 
-                if colname in ["Name", "Address", "Len", "Device ID", "Period"]:
+                if colname in ["Name", "Address", "Len", "Device ID", "Period", "Timeout"]:
                     editor = wx.grid.GridCellTextEditor()
                 elif colname == "Transfer method":
                     editor = wx.grid.GridCellChoiceEditor()
@@ -150,7 +150,8 @@ class MBRequestDataPanel (wx.Panel):
                 "Description": DESCRIPTION,
                 "Device ID" : "1",
                 "Transfer method" : "Periodic",
-                "Period" : "100" }
+                "Period" : "100",
+                "Timeout" : "100",}
         self.Table = MBRequestDataTable(self)
         self.ColAlignements = [wx.ALIGN_RIGHT] + \
                               [wx.ALIGN_LEFT]*(len(self.VariablesDefaultValue))
@@ -234,6 +235,7 @@ class MBRequestDataPanel (wx.Panel):
                 "Data type": u"WORD",
                 "Transfer method": "",
                 "Period": "",
+                "Timeout": "",
                 "Description": MASTER_OPTION,
                 "Modbus type": self.masterSelectCmbx.cmbbox.GetStringSelection()}
 
