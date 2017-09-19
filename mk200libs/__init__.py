@@ -15,3 +15,7 @@ class MK200Library(POULibrary):
 class MK200Modbus(POULibrary):
     def GetLibraryPath(self):
         return os.path.join(os.path.split(__file__)[0], "modbuslib.xml")
+
+class MK200AdditionalConversion(POULibrary):
+    def GetLibraryPath(self):
+        return os.path.join(os.path.split(__file__)[0], "typeConvershionalLib.xml")

@@ -58,10 +58,10 @@ class DoModuleFile(CodeFile):
             }, ...]
         @return: [(C_file_name, CFLAGS),...] , LDFLAGS_TO_APPEND
         """
-        print locations
+        # print locations
 
         current_location = self.GetCurrentLocation()
-        print current_location
+        # print current_location
         # define a unique name for the generated C file
         location_str = "_".join(map(str, current_location))
         iecChannel = self.GetFullIEC_Channel()[:1];

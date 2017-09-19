@@ -147,6 +147,7 @@ class toolchain_gcc():
                         self.CTRInstance.logger.write("   [CC]  "+bn+" -> "+obn+"\n")
 
                         # Add -std=c99 option for c-files, and remove it from .cpp if exist
+                        Builder_CFLAGS += " -DSTM32F429_439xx -DUSE_STDPERIPH_DRIVER "
                         if CFile.endswith(".c"):
                             Builder_CFLAGS += " -std=c99 "
                         else:

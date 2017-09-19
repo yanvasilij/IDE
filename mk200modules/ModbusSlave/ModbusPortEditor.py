@@ -81,7 +81,7 @@ class PortEditorTable (ModbusSalveTable):
                 if errorStatus >= 2:
                     erroCheck = True
         if erroCheck:
-            print("COM ERROR!" * 10)
+            # print("COM ERROR!" * 10)
             message = _("lol")
             dialog = wx.MessageDialog(self.Parent, message, _("Error"))
             dialog.ShowModal()

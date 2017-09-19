@@ -103,7 +103,7 @@
                     <xhtml:p><![CDATA[Set input WORD type variable in modbus holding register]]></xhtml:p>
                 </documentation>
             </pou>
-            <pou name="SET_LONG" pouType="function" >
+            <pou name="SET_HOLDING_LONG" pouType="function" >
                 <interface>
                     <returnType>
                         <INT/>
@@ -134,8 +134,8 @@
                      extern u8 setU16Holding (u32 adr, u16 value);
                      u16 high = IN_DWORD;
                      u16 low = IN_DWORD >> 16;
-                     SET_LONG = setU16Holding(ADDR, IN_DWORD);
-                     SET_LONG = setU16Holding(ADDR + 1, (IN_DWORD >> 16));
+                     setU16Holding(ADDR, IN_DWORD);
+                     SET_HOLDING_LONG = setU16Holding(ADDR + 1, (IN_DWORD >> 16));
                      }}
                     ]]>
                     </ST>
@@ -211,6 +211,41 @@
                     <xhtml:p><![CDATA[Return WORD type variable from modbus holding register]]></xhtml:p>
                 </documentation>
             </pou>
+
+            <pou name="GET_HOLDING_LONG" pouType="function">
+                <interface>
+                    <returnType>
+                        <DWORD/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="ADDR">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     extern u16 getU16Holding (u32 adr);
+                     u16 high= getU16Holding(ADDR);
+                     u16 low = getU16Holding(ADDR + 1);
+                     GET_HOLDING_LONG = (low << 16) | high;
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+                <documentation>
+                    <xhtml:p><![CDATA[Return WORD type variable from modbus holding register]]></xhtml:p>
+                </documentation>
+            </pou>
+
             <pou name="SET_INPUT_WORD" pouType="function">
                 <interface>
                     <returnType>

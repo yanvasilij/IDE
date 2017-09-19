@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <fileHeader companyName="Unknown"
+                productName="Unnamed"
+                productVersion="1"
+                creationDateTime="2013-01-29T14:01:00"/>
+    <contentHeader name="Unnamed"
+                   modificationDateTime="2017-06-08T15:59:13">
+        <coordinateInfo>
+            <fbd>
+                <scaling x="0" y="0"/>
+            </fbd>
+            <ld>
+                <scaling x="0" y="0"/>
+            </ld>
+            <sfc>
+                <scaling x="0" y="0"/>
+            </sfc>
+        </coordinateInfo>
+    </contentHeader>
+    <types>
+        <pous>
+         <pou name="WORDS_TO_REAL" pouType="function">
+                <interface>
+                    <returnType>
+                        <REAL/>
+                    </returnType>
+                    <inputVars>
+                        <variable name="WORD_1">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                        <variable name="WORD_2">
+                            <type>
+                                <WORD/>
+                            </type>
+                        </variable>
+                    </inputVars>
+                </interface>
+                <body>
+                    <ST>
+                        <![CDATA[
+                     {{
+                     #include <stdint.h>
+                     typedef uint32_t u32;
+                     typedef uint16_t u16;
+                     typedef uint8_t u8;
+                     u32 out_value = WORD_1 | (WORD_2 << 16);
+                     WORDS_TO_REAL = *(float*)&out_value;
+                     }}
+                    ]]>
+                    </ST>
+                </body>
+         </pou>
+
+
+        </pous>
+    </types>
+    <instances>
+        <configurations/>
+    </instances>
+</project>
