@@ -313,7 +313,7 @@ class MK211CANOpenFile (MK200CANOpenFile):
         text += "#include \"MK201_IO.h\"\r\n"
 
         node_id = [i["Address"] for i in self.GetVariables() if i["Description"] == NODE_ID_DESCRIPTION]
-        print node_id
+        # print node_id
         if len(node_id) > 0:
             node_id = node_id[0]
         else:

@@ -14,6 +14,7 @@ from MK243CANOpen import MK243CANOpenFile
 from MK245CANOpen import MK245CANOpenFile
 from MK201CANOpen import MK201CANOpenFileEditor
 
+
 DIV_BEGIN = "/" + ("*"*82) + "\n\t\t\t"
 DIV_END = "\n" + ("*"*82) + "/\n"
 

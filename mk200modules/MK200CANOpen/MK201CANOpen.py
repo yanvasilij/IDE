@@ -111,7 +111,38 @@ class MK201CANOpenFile(CodeFile):
     def GetConfNodeGlobalInstances(self):
         return []
 
+    def GenerateDefaultVariables(self):
+        defaultConfig = []
+        cobeID = self.GetFullIEC_Channel()
+        cobeID = cobeID[:-2].replace('.', '_')
+        defaultConfig.append({
+            "Name" : "Node_ID_{}".format(cobeID),
+            "Address" : "127",
+            "Len" : "",
+            "Type" : u"INT",
+            "Initial": "",
+            "Description": "Node ID",
+            "OnChange":"",
+            "Value":"",
+            "Options":""})
+        defaultConfig.append({
+            "Name" : "Node_ID_{}".format(cobeID),
+            "Address" : "127",
+            "Len" : "",
+            "Type" : u"INT",
+            "Initial": "",
+            "Description": "Node ID",
+            "OnChange":"",
+            "Value":"",
+            "Options":""})
+        return defaultConfig
+
     def GetVariables(self):
+        datas = []
+        codeFileVariables = self.CodeFileVariables(self.CodeFile)
+        if len(codeFileVariables) == 0:
+            datas = self.GenerateDefaultVariables()
+            return datas
         datas = []
         for var in self.CodeFileVariables(self.CodeFile):
             datas.append({"Name" : var.getname(),
@@ -190,7 +221,7 @@ class MK201CANOpenFile(CodeFile):
         text += "#include \"MK200CANOpenMasterProcess.h\"\r\n"
 
         node_id = [i["Address"] for i in self.GetVariables() if i["Description"] == NODE_ID_DESCRIPTION]
-        print node_id
+        # print node_id
         if len(node_id) > 0:
             node_id = node_id[0]
         else:

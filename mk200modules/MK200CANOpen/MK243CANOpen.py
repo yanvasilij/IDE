@@ -266,7 +266,7 @@ class MK243CANOpenFile (MK200CANOpenFile):
                 text += "    mk243_{0}.dInput[{1}].enabled = 1;\n".format(location_str, channel)
 
         do_config = [i for i in self.GetVariables() if i["Description"] == DO_DESCRIPTION]
-        print 'do_config ', do_config
+        # print 'do_config ', do_config
         for config in do_config:
             channel = self.GetChannelFromName(config["Name"])
             if config["Options"] == "Off":
@@ -305,7 +305,7 @@ class MK243CANOpenFile (MK200CANOpenFile):
         text += "#include \"MK201_IO.h\"\r\n"
 
         node_id = [i["Address"] for i in self.GetVariables() if i["Description"] == NODE_ID_DESCRIPTION]
-        print node_id
+        # print node_id
         if len(node_id) > 0:
             node_id = node_id[0]
         else:

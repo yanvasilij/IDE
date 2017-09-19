@@ -158,6 +158,7 @@ class MK245CANOpenFile (MK200CANOpenFile):
             "OnChange":"",
             "Value":"",
             "Options":""})
+        # print " GenerateDefaultVariables "
         return defaultConfig
 
     def GetVariables(self):
@@ -263,12 +264,12 @@ class MK245CANOpenFile (MK200CANOpenFile):
 
         current_location = self.GetCurrentLocation()
         location_str = "_".join(map(str, current_location))
-        print 'location_str ', location_str
+        # print 'location_str ', location_str
         text = ""
         text += "#include \"MK200CANOpenMasterProcess.h\"\r\n"
 
         node_id = [i["Address"] for i in self.GetVariables() if i["Description"] == NODE_ID_DESCRIPTION]
-        print node_id
+        # print node_id
         if len(node_id) > 0:
             node_id = node_id[0]
         else:
