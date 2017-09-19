@@ -104,7 +104,7 @@ class DownloadTransaction(MK200Transaction):
         # first - parse first line it must be exact format
         parsed = self.ParseLineFromHex(firstline)
         if (parsed["Type"] != "Extended Linear Address") or (parsed["Len"] != 2):
-            print "Invalid hex-file"
+            # print "Invalid hex-file"
             return
         bindata = []
         lastParsed = None
@@ -146,7 +146,8 @@ class DownloadTransaction(MK200Transaction):
     def GetCommandAck(self):
         res = self.SerialPort.Read(50)
         if res == "Done\r\n":
-            print "Download successful!"
+            pass
+            # print "Download successful!"
         return 0x55
 
     def SendCommand(self):
