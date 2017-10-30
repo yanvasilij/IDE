@@ -123,7 +123,7 @@ class ModbusSlaveFile(CodeFile):
             self.CodeFile.variables.appendvariable(variable)
 
     def GetIconName(self):
-        return "CFile"
+        return "Cfile"
 
     def CodeFileName(self):
         return os.path.join(self.CTNPath(), "mbslave.xml")

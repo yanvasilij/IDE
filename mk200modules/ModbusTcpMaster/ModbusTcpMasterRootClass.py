@@ -94,7 +94,7 @@ class RootClass(CodeFile):
         pass
 
     def GetIconName(self):
-        return "CFile"
+        return "Cfile"
 
     def _CloseView(self, view):
         app_frame = self.GetCTRoot().AppFrame

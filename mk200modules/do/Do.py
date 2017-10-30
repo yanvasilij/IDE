@@ -40,7 +40,7 @@ class DoModuleFile(CodeFile):
         return []
 
     def GetIconName(self):
-        return "CFile"
+        return "Cfile"
 
     def CodeFileName(self):
         return os.path.join(self.CTNPath(), "cfile.xml")

@@ -120,7 +120,7 @@ class mk201_proto(SerialPort):
             wx.PostEvent(self._wxParent, evt)
 
     def saveHex(self, hex, path):
-        self.hexFileOut = open(path + '\\hexFileOut.hex', 'a')
+        self.hexFileOut = open(os.path.join(path,'hexFileOut.hex'), 'a')
         self.hexFileOut.write(hex)
         self.hexFileOut.close()
 
