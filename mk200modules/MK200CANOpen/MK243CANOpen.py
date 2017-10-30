@@ -207,7 +207,7 @@ class MK243CANOpenFile (MK200CANOpenFile):
             self.CodeFile.variables.appendvariable(variable)
 
     def GetIconName(self):
-        return "CFile"
+        return "Cfile"
 
     def _CloseView(self, view):
         app_frame = self.GetCTRoot().AppFrame
