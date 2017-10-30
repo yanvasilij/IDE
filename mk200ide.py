@@ -40,7 +40,7 @@ class MK200Beremiz(BeremizIDELauncher):
             ('AdditionalConversionTypes',  'mk200libs.MK200AdditionalConversion')]
 
         from util.BitmapLibrary import AddBitmapFolder
-        images = os.path.dirname(os.path.realpath(__file__)) + "\\images"
+        images = os.path.join(os.path.dirname(os.path.realpath(__file__)),"images")
         AddBitmapFolder(images)
         import targets
         from mk200targets import mk200targets
@@ -91,7 +91,7 @@ class MK200Beremiz(BeremizIDELauncher):
 
     def _setMK201Connector(self):
         from mk201connectorDialog import ConnectDialog
-        xmlPath = self.frame.CTR.ProjectPath + "\\beremiz.xml"
+        xmlPath = os.path.join(self.frame.CTR.ProjectPath, "beremiz.xml")
         tree = ET.parse(xmlPath)
         root = tree.getroot()
         connectDialog = ConnectDialog(self.frame)
@@ -110,7 +110,7 @@ class MK200Beremiz(BeremizIDELauncher):
             return 0
 
     def _Connect_MK201(self):
-        xmlPath = self.frame.CTR.ProjectPath + "\\beremiz.xml"
+        xmlPath = os.path.join(self.frame.CTR.ProjectPath,"beremiz.xml")
         tree = ET.parse(xmlPath)
         root = tree.getroot()
         curUri = root.get('URI_location')
@@ -126,7 +126,7 @@ class MK200Beremiz(BeremizIDELauncher):
 
     def _Configurator(self):
         from MKSetup.configurator_MK201setup import Configurator_MK201
-        projectPath = self.frame.CTR.ProjectPath + "\\"
+        projectPath = self.frame.CTR.ProjectPath + os.path.sep
         serialObject = None
         connector = self.frame.CTR._connector
         if not(connector is None):
