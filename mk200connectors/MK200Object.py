@@ -74,7 +74,7 @@ class MK200Object():
         failure = None;
         res, failure = self._HandleSerialTransaction(transaction, True)
         if failure is not None:
-            print(failure + "\n")
+            # print(failure + "\n")
             self.confnodesroot.logger.write_warning(failure + "\n")
         return res
 
@@ -212,26 +212,26 @@ if __name__ == "__main__":
 
         def write(self, v):
             self.lock.acquire()
-            print(v)
+            # print(v)
             self.lock.release()
 
         def writeyield(self, v):
             self.lock.acquire()
-            print(v)
+            # print(v)
             self.lock.release()
 
         def write_warning(self, v):
             if v is not None:
                 self.lock.acquire()
                 msg = "Warning: " + v
-                print(msg)
+                # print(msg)
                 self.lock.release()
 
         def write_error(self, v):
             if v is not None:
                 self.lock.acquire()
                 msg = "Warning: " + v
-                print(msg)
+                # print(msg)
                 self.lock.release()
 
 
@@ -248,14 +248,14 @@ if __name__ == "__main__":
     TstLib = os.path.dirname(os.path.realpath(__file__)) + "/../../../YaPySerial/bin/libYaPySerial" + lib_ext
 
     TstRoot = TestRoot()
-    print "Construct PLC..."
+    # print "Construct PLC..."
     TstPLC = YAPLCObject(TstLib, TstRoot, "COM10")
 
-    print "Start PLC..."
+    # print "Start PLC..."
     res = TstPLC.StartPLC()
-    print(res)
+    # print(res)
 
-    print "Get PLC status..."
+    # print "Get PLC status..."
     res = TstPLC.GetPLCstatus();
     print(res)
 
