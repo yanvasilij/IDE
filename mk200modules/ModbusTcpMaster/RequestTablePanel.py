@@ -60,7 +60,7 @@ class MBRequestDataTable (CustomTable):
     def __init__(self, parent):
         CustomTable.__init__(self, parent,
                 [], ["#", "Name", "Device ID", "Address", "Modbus type", "Data type",
-                    "Len", "Transfer method", "Period"])
+                    "Len", "Transfer method", "Period (ms)"])
 
     def _updateColAttrs(self, grid):
         content = self.GetData()
@@ -70,7 +70,7 @@ class MBRequestDataTable (CustomTable):
                 renderer = None
                 colname = self.GetColLabelValue(col, False)
 
-                if colname in ["Name", "Address", "Len", "Device ID", "Period"]:
+                if colname in ["Name", "Address", "Len", "Device ID", "Period (ms)"]:
                     editor = wx.grid.GridCellTextEditor()
                 elif colname == "Transfer method":
                     editor = wx.grid.GridCellChoiceEditor()
@@ -142,7 +142,7 @@ class RequestTablePanel (wx.Panel):
                 "Len" : "1",
                 "Modbus type": "",
                 "Device ID" : "1",
-                "Period": "",
+                "Period (ms)": "100",
                 "Description": DESCRIPTION_IP,}
         self.portDefault ={
                 "Name": "port",
@@ -153,7 +153,7 @@ class RequestTablePanel (wx.Panel):
                 "Len" : "1",
                 "Modbus type": "",
                 "Device ID" : "1",
-                "Period": "",
+                "Period (ms)": "100",
                 "Description": DESCRIPTION_PORT}
 
         # виджеты для текста IP (label)
@@ -193,7 +193,7 @@ class RequestTablePanel (wx.Panel):
                 "Description": DESCRIPTION,
                 "Device ID" : "1",
                 "Transfer method" : "Periodic",
-                "Period" : "100" }
+                "Period (ms)" : "100" }
         self.Table = MBRequestDataTable(self)
         self.ColAlignements = [wx.ALIGN_RIGHT] + \
                               [wx.ALIGN_LEFT]*(len(self.VariablesDefaultValue))
@@ -280,7 +280,7 @@ class RequestTablePanel (wx.Panel):
                 "Device ID": "",
                 "Data type": u"WORD",
                 "Transfer method": "",
-                "Period": "",
+                "Period (ms)": "",
                 "Description": MASTER_OPTION,
                 "Modbus type": "0"}
 

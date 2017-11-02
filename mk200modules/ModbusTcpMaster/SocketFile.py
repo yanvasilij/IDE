@@ -109,7 +109,7 @@ class SocketFile (CodeFile):
                           "Address" : var.getaddress(),
                           "Len" : var.getlen(),
                           "Transfer method" : var.gettxtype(),
-                          "Period" : var.getperiod(),
+                          "Period (ms)" : var.getperiod(),
                           })
         return datas
 
@@ -125,7 +125,7 @@ class SocketFile (CodeFile):
             variable.setlen(var["Len"])
             variable.setdesc(var["Description"])
             variable.settxtype(var["Transfer method"])
-            variable.setperiod(var["Period"])
+            variable.setperiod(var["Period (ms)"])
             self.CodeFile.variables.appendvariable(variable)
 
     def GetIconName(self):
@@ -172,57 +172,81 @@ class SocketFile (CodeFile):
         for request, i in zip(requests, range(0, len(requests))):
             varName = request["Name"]
             varName = varName.upper()
+
+            """ Buffers for protected read befor and after user cycle """
+            publish_buffer_name = "{0}_publishBuf".format(request["Name"])
+            retrive_buffer_name = "{0}_retriveBuf".format(request["Name"])
+            requestStruct += "static u16 {0}[{1}] __attribute__((section(\"._sdram\")));\n".format(publish_buffer_name, request["Len"])
+            requestStruct += "static u16 {0}[{1}] __attribute__((section(\"._sdram\")));\n".format(retrive_buffer_name, request["Len"])
+
+            """ Callbask for accessing data """
             requestStruct += "void "+request["Name"]+"_reqGetHandler (u16 * data)\n{\n"
             requestStruct += "\tu32 i,j;\n"
             if request["Data type"] == "BOOL":
                 if int(request["Len"]) == 1:
+                    requestStruct + "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tdata[0] = 0;\n"
-                    requestStruct += "\tif (*__GET_GLOBAL_{}())\n".format(varName)
+                    requestStruct += "\tif ({0}[0])\n".format(publish_buffer_name)
                     requestStruct += "\t\tdata[0] |= (1<<0);\n"
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
                 else:
+                    requestStruct + "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tfor(i=0, j=0; i<{}; i++, j=i/16)\n".format(request["Len"])
                     requestStruct += "\t\tdata[j] = 0;\n"
                     requestStruct += "\tfor(i=0, j=0; i<{}; i++, j=i/16)\n".format(request["Len"])
                     requestStruct += "\t{\n"
                     requestStruct += "\t\tu8 offset = i%16;\n"
-                    requestStruct += "\t\tif ( __GET_GLOBAL_{}()->table[i] )\n".format(varName)
+                    requestStruct += "\t\tif ( {}[i] )\n".format(publish_buffer_name)
                     requestStruct += "\t\t\tdata[j] |= (1<<offset);\n"
                     requestStruct += "\t}\n"
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
             else:
                 if int(request["Len"]) == 1:
-                    requestStruct += "\tdata[0] = *__GET_GLOBAL_{}();\n".format(varName)
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                    requestStruct += "\tdata[0] = {}[0];\n".format(publish_buffer_name)
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
                 else:
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tfor (i=0; i<{}; i++)\n".format(request["Len"])
                     requestStruct += "\t{\n"
-                    requestStruct += "\t\tdata[i] = __GET_GLOBAL_{}()->table[i];\n".format(varName)
+                    requestStruct += "\t\tdata[i] = {}[i];\n".format(publish_buffer_name)
                     requestStruct += "\t}\n"
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
             requestStruct += "};\n\n"
 
             requestStruct += "void "+request["Name"]+"_reqSetHandler (u16 * data) \n{\n\n"
             requestStruct += "\tu32 i,j;\n"
             if request["Data type"] == "BOOL":
                 if int(request["Len"]) == 1:
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tif (data[0] & 1)\n".format(varName)
-                    requestStruct += "\t\t*__GET_GLOBAL_{}() = 1;\n".format(varName)
+                    requestStruct += "\t\t{}[0] = 1;\n".format(retrive_buffer_name)
                     requestStruct += "\telse\n"
-                    requestStruct += "\t\t*__GET_GLOBAL_{}() = 0;\n".format(varName)
+                    requestStruct += "\t\t{}[0] = 0;\n".format(retrive_buffer_name)
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
                 else:
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tfor(i=0, j=0; i<{}; i++, j=i/16)\n".format(request["Len"])
                     requestStruct += "\t{\n"
                     requestStruct += "\t\tu8 offset = i%16;\n"
                     requestStruct += "\t\tif ( data[j] & (1<<offset) )\n".format(varName)
-                    requestStruct += "\t\t\t__GET_GLOBAL_{}()->table[i] = 1;\n".format(varName)
+                    requestStruct += "\t\t\t{}[i] = 1;\n".format(retrive_buffer_name)
                     requestStruct += "\t\telse\n"
-                    requestStruct += "\t\t\t__GET_GLOBAL_{}()->table[i] = 0;\n".format(varName)
+                    requestStruct += "\t\t\t{}[i] = 0;\n".format(retrive_buffer_name)
                     requestStruct += "\t}\n"
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
             else:
                 if int(request["Len"]) == 1:
-                    requestStruct += "\t*__GET_GLOBAL_{}() = data[0];\n".format(varName)
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                    requestStruct += "\t{}[0] = data[0];\n".format(retrive_buffer_name)
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
                 else:
+                    requestStruct += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
                     requestStruct += "\tfor (i=0; i<{}; i++)\n".format(request["Len"])
                     requestStruct += "\t{\n"
-                    requestStruct += "\t\t__GET_GLOBAL_{}()->table[i] = data[i];\n".format(varName)
+                    requestStruct += "\t\t{}[i] = data[i];\n".format(retrive_buffer_name)
                     requestStruct += "\t}\n"
+                    requestStruct += "\txSemaphoreGive(dataAccessMutex);\n"
             requestStruct += "};\n\n"
 
             prototypes += "extern RequestType req_" + request["Name"] + ";\r\n"
@@ -239,17 +263,63 @@ class SocketFile (CodeFile):
             requestStruct += "\t100,\n"
             requestStruct += "\t{},\n".format(request["Device ID"])
             requestStruct += "\t0,\n"
-            requestStruct += "\t{},\n".format(request["Period"])
+            requestStruct += "\t{},\n".format(request["Period (ms)"])
             requestStruct += "\t{},\n".format(request["Address"])
             requestStruct += "\t{},\n".format(request["Len"])
             requestStruct += "\t{}_reqGetHandler,\n".format(request["Name"])
             requestStruct += "\t{}_reqSetHandler\n".format(request["Name"])
             requestStruct += "};\n\n"
+            requestStruct += "static u16 req_{0}_status;\n".format(request["Name"])
+            requestStruct += "static u16 req_{0}_err;\n".format(request["Name"])
             requestStruct += "void *__QX{0}_{1}_{2} = &req_{3}.run;\n".format(iecChannel, i, 0, request["Name"])
-            requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}.status;\n".format(iecChannel, i, 1, request["Name"])
-            requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}.error;\n".format(iecChannel, i, 2, request["Name"])
+            requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}_status;\n".format(iecChannel, i, 1, request["Name"])
+            requestStruct += "void *__QW{0}_{1}_{2} = &req_{3}_err;\n".format(iecChannel, i, 2, request["Name"])
             requestStruct += "\n"
         return requestStruct, prototypes
+
+    def GeneratePublishFunction(self, location_str, requests):
+        text = "extern \"C\" void __publish_%s(void)\n{\n"%location_str
+        text += "\tu32 i;\n"
+        for request in requests:
+            publish_buffer_name = "{0}_publishBuf".format(request["Name"])
+            varName = request["Name"]
+            varName = varName.upper()
+            if int(request["Len"]) == 1:
+                text += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                text += "\t{0}[0] = *__GET_GLOBAL_{1}();\n\n".format(publish_buffer_name, varName)
+                text += "\txSemaphoreGive(dataAccessMutex);\n"
+            else:
+                text += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                text += "\tfor (i=0; i<{}; i++)\n".format(request["Len"])
+                text += "\t{\n"
+                text += "\t\t{0}[i] = __GET_GLOBAL_{1}()->table[i];\n".format(publish_buffer_name, varName)
+                text += "\t}\n\n"
+                text += "\txSemaphoreGive(dataAccessMutex);\n"
+            text += "\treq_{0}_status = req_{0}.status;\n\n".format(request["Name"])
+            text += "\treq_{0}_err = req_{0}.error;\n\n".format(request["Name"])
+        text += "\n}\n\n"
+        return text
+
+    def GenerateRetriveFunction(self, location_str, requests):
+        text = "extern \"C\" void __retrieve_%s(void)\n{\n"%location_str
+        text += "\tu32 i;\n"
+        for request in requests:
+            retrive_buffer_name = "{0}_retriveBuf".format(request["Name"])
+            varName = request["Name"]
+            varName = varName.upper()
+            if int(request["Len"]) == 1:
+                text += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                text += "\t*__GET_GLOBAL_{0}() = {1}[0];\n\n".format(varName, retrive_buffer_name)
+                text += "\txSemaphoreGive(dataAccessMutex);\n"
+            else:
+                text += "\txSemaphoreTake(dataAccessMutex, portMAX_DELAY);\n"
+                text += "\tfor (i=0; i<{}; i++)\n".format(request["Len"])
+                text += "\t{\n"
+                text += "\t\t__GET_GLOBAL_{0}()->table[i] = {1}[i];\n".format(varName, retrive_buffer_name)
+                text += "\t}\n\n"
+                text += "\txSemaphoreGive(dataAccessMutex);\n"
+        text += "\n}\n\n"
+        return text
 
     def CTNGenerate_C(self, buildpath, locations):
         current_location = self.GetCurrentLocation()
@@ -271,6 +341,12 @@ class SocketFile (CodeFile):
         mbsAccHdrFile.write(modbusAccesorHeaderText)
         """Include this header to .c file"""
         text = "#include \"%s\"\n\n"%modbusAccesorHeaderName
+        text += "#include \"FreeRTOS.h\"\n"
+        text += "#include \"task.h\"\n"
+        text += "#include \"semphr.h\"\n\n"
+
+        """ Mutex for protect frome simultanios data acces from user app and form modbus """
+        text += "static SemaphoreHandle_t dataAccessMutex;\n"
 
         structurest, prototypes = self.GenerateRequestSturcts()
 
@@ -292,25 +368,29 @@ class SocketFile (CodeFile):
         text += "\tu16 port = {};\n".format(port)
         text += "\tmbSocket.init(ip, port, 1000);\n"
 
+        text += "\tdataAccessMutex = xSemaphoreCreateMutex();\n"
         requests = [i for i in self.GetVariables() if i["Description"] == "Modus master request data"]
         for request in requests:
             text += "\tmbSocket.addRequest(&req_{0});\n".format(request["Name"])
+            text += "\tif(req_{0}.ciclic)\n".format(request["Name"])
+            text += "\t\treq_{0}.run = 1;\n".format(request["Name"])
+            text += "\treq_{0}.status = MBRequestSuccesfulyDone;\n".format(request["Name"])
+            text += "\treq_{0}.error = MBNotProcessingYet;\n".format(request["Name"])
+            request_data_len = int(request["Len"]) * 2
+            text += "\tmemset({0}_publishBuf, 0, {1});\n".format(request["Name"], request_data_len)
+            text += "\tmemset({0}_retriveBuf, 0, {1});\n".format(request["Name"], request_data_len)
 
         text += "\n\txTaskCreate(mbTcpMasterSocketTask, \"mbTcpMasterSocketTask\", " \
-                "configMINIMAL_STACK_SIZE*5, NULL, 1, NULL);\n"
+                "configMINIMAL_STACK_SIZE*5, NULL, 2, NULL);\n"
 
         text += "\treturn 0;\n}\n\n"
 
         text += "extern \"C\" void __cleanup_%s(void)\n{\n"%location_str
         text += "\n}\n\n"
 
-        text += "extern \"C\" void __retrieve_%s(void)\n{\n"%location_str
-        text += "   ;\n"
-        text += "\n}\n\n"
+        text += self.GenerateRetriveFunction(location_str, requests)
 
-        text += "extern \"C\" void __publish_%s(void)\n{\n"%location_str
-        text += "\n"
-        text += "\n}\n\n"
+        text += self.GeneratePublishFunction(location_str, requests)
 
         Gen_Cfile_path = os.path.join(buildpath, "mbTcpMasterSocket_%s.cpp"%location_str)
         cfile = open(Gen_Cfile_path,'w')
