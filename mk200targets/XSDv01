@@ -1,4 +1,4 @@
-      <xsd:element name="MKLogik201_HV_2_0">
+      <xsd:element name="MKLogik201_HV_3_1">
         <xsd:complexType>
           <xsd:attribute name="Compiler" type="xsd:string" use="optional" default="../gcc-arm-none-eabi_4.9.3_win32/bin/arm-none-eabi-gcc"/>
           <xsd:attribute name="CFLAGS" type="xsd:string" use="optional" default="-mcpu=cortex-m3 -fstack-usage -ffunction-sections -mlittle-endian -mthumb -g -D STM32F407xx -D USE_HAL_DRIVER"/>

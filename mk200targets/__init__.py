@@ -5,7 +5,7 @@
 import os
 from toolchain_gcc import toolchain_gcc
 
-class MKLogik200_target(toolchain_gcc):
+class MKLogik200_target_HV_2_0(toolchain_gcc):
     dlopen_prefix = ""
     extension = ".elf"
     def getSTM32Config(self, flagsname):
@@ -32,7 +32,7 @@ class MKLogik200_target(toolchain_gcc):
         sourceDir = objFileDir + r'/source/common/src'
         additionalobjects = additionalobjects + ["\"" + sourceDir + r'/syscalls.c.obj' + "\""]
 
-        runTime = "\"" + objFile + r'/beremizStm32Port/librunTime.a' + "\""
+        runTime = "\"" + objFile + r'/beremizStm32Port/libmk201_hw_2_0.a' + "\""
         additionalobjects = additionalobjects + [runTime]
 
         stm32_ldflags = self.getSTM32Config("ldflags")
@@ -81,7 +81,31 @@ class MKLogik200_target(toolchain_gcc):
             self.CTRInstance.LocationCFilesAndCFLAGS.append(cfileAndCFlag)
         return toolchain_gcc.build(self)
 
+class MKLogik200_target_HV_3_0(MKLogik200_target_HV_2_0):
+
+    def getBuilderLDFLAGS(self):
+        objFile = os.path.dirname(os.path.realpath(__file__))
+        objFile = "".join(os.path.split(objFile)[0])
+        objFile = "".join(os.path.split(objFile)[0])
+        objFileDir = objFile + r'/beremizStm32Port/CMakeFiles/BeremizPort.elf.dir'
+
+        additionalobjects = []
+
+        sourceDir = objFileDir + r'/source/common/src'
+        additionalobjects = additionalobjects + ["\"" + sourceDir + r'/syscalls.c.obj' + "\""]
+
+        runTime = "\"" + objFile + r'/beremizStm32Port/libmk201_hw_3_1.a' + "\""
+        additionalobjects = additionalobjects + [runTime]
+
+        stm32_ldflags = self.getSTM32Config("ldflags")
+        ldscript = ['-T'] + ["\"" + objFile + r'/beremizStm32Port/linkScript/STM32F407ZG_FLASH.ld' + "\""] #[os.path.dirname(os.path.realpath(__file__)) + r'/port/STM32F407ZG_FLASH.ld']
+        return additionalobjects + toolchain_gcc.getBuilderLDFLAGS(self) + stm32_ldflags + ldscript# + ["-shared"]
+
 _base_path = os.path.split(__file__)[0]
-mk200targets = {'MKLogik200': {'code': {'plc_MKLogik200_main.c': os.path.join(_base_path, 'plc_MKLogik200_main.c')},
-                               'class': lambda: MKLogik200_target, 'xsd':os.path.join(_base_path, 'XSD')}}
+
+mk200targets = {'MKLogik201_HV_2_0': {'code': {'plc_MKLogik200_main.c': os.path.join(_base_path, 'plc_MKLogik200_main.c')},
+                               'class': lambda: MKLogik200_target_HV_2_0, 'xsd':os.path.join(_base_path, 'XSD')}}
+
+mk200targetsV01 = {'MKLogik201_HV_3_1': {'code': {'plc_MKLogik200_main.c': os.path.join(_base_path, 'plc_MKLogik200_main.c')},
+                               'class': lambda: MKLogik200_target_HV_3_0, 'xsd':os.path.join(_base_path, 'XSDv01')}}
 

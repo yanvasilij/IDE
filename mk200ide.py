@@ -43,12 +43,13 @@ class MK200Beremiz(BeremizIDELauncher):
         images = os.path.dirname(os.path.realpath(__file__)) + "\\images"
         AddBitmapFolder(images)
         import targets
-        from mk200targets import mk200targets
+        from mk200targets import mk200targets, mk200targetsV01
         targets.targets = {}
         targets.targets.update(mk200targets)
+        targets.targets.update(mk200targetsV01)
         BeremizIDELauncher.ImportModules(self)
         import BeremizIDE
-        BeremizIDE.ProjectController.GetDefaultTargetName = lambda x: "MKLogik200"
+        BeremizIDE.ProjectController.GetDefaultTargetName = lambda x: "MKLogik201_HV_2_0"
         import connectors
         import mk200connectors
         connectors.connectors = {}
