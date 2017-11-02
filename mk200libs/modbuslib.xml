@@ -31,7 +31,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -73,7 +73,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -111,7 +111,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -152,7 +152,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <WORD/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -188,7 +188,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <WORD/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -220,7 +220,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <WORD/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -254,7 +254,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -292,7 +292,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <WORD/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -323,7 +323,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -361,7 +361,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -389,7 +389,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
@@ -427,7 +427,7 @@
                     <inputVars>
                         <variable name="ADDR">
                             <type>
-                                <INT/>
+                                <UINT/>
                             </type>
                         </variable>
                     </inputVars>
