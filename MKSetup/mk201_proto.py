@@ -225,8 +225,8 @@ class mk201_proto(SerialPort):
         self.write("SendTotalCRC {}\r\n".format(total_crc))
         time.sleep(1)
         end_answer = ""
-        end_answer += self.read(read_len)
-        end_answer += self.read(read_len)
+        end_answer += self.serial.read(read_len)
+        end_answer += self.serial.read(read_len)
         if "Total CRC correct" in end_answer:
             # print "Youpi! Its work!"
             self.write("RunUserApp\r\n")

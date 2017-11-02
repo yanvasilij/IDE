@@ -18,7 +18,7 @@ from mk201_proto import mk201_proto
 VERISON = '0.0.1'
 
 # wx ID
-GRID_BORDER = 2
+GRID_BORDER = 1
 
 
 ID_MAINWXFRAME = wx.NewId()
@@ -26,7 +26,7 @@ ID_MAINWXDIALOGFRAME = wx.NewId()
 
 BTN_SIZE = (75, 23)
 
-TEXT_WIDGET_SIZE = (30, 13)
+TEXT_WIDGET_SIZE = (45, 13)
 PARITY_WIDGET_SIZE = (54, 21)
 BAUD_WIDGET_SIZE = (66, 21)
 DATA_WIDGET_SIZE = (40, 21)
@@ -341,7 +341,7 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
 
     def initWxFrame(self):
         wx.Frame.__init__(self, None, id = ID_MAINWXFRAME, title = "MKSetup " + VERISON, name = 'mainWxFrame',
-                          pos=(150,150), size = (self.heigthFrame, self.widthFrame))
+                          pos=(15,15), size = (self.heigthFrame, self.widthFrame))
         menuBar = wx.MenuBar()
         menu = wx.Menu()
         m_open = menu.Append(wx.ID_ANY, "O&pen\tCtrl-O", "Open config-file")
@@ -363,7 +363,7 @@ class ConfiguratorGUI(wx.Frame, wx.Dialog):
 
     def initWxDialogFrame(self):
         wx.Dialog.__init__(self, parent = self.parent, id = ID_MAINWXDIALOGFRAME, title = "MKSetup " + VERISON, name = 'mainWxFrame',
-                          pos=(150,150), size = (self.heigthFrame, self.widthFrame))
+                          pos=(15,15), size = (self.heigthFrame, self.widthFrame))
 
         self.frameParent = self
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
