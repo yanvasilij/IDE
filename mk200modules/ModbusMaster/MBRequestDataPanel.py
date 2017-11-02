@@ -45,6 +45,7 @@ class ComboBoxWithLabel(wx.Panel):
         newId = wx.NewId()
         self.cmbbox = wx.ComboBox(self, id=newId, value="Master option",
                                   choices=cmbBxchoices, size=wx.Size(100, HEIGHT))
+        self.cmbbox.SetSelection(1)
         main_sizer.Add(self.lable, flag=wx.ALIGN_CENTER_VERTICAL)
         main_sizer.Add(self.cmbbox, flag=wx.ALIGN_CENTER_VERTICAL)
 
@@ -55,7 +56,7 @@ class MBRequestDataTable (CustomTable):
     def __init__(self, parent):
         CustomTable.__init__(self, parent,
                 [], ["#", "Name", "Device ID", "Address", "Modbus type", "Data type",
-                    "Len", "Transfer method", "Period", "Timeout"])
+                    "Len", "Transfer method", "Period (ms)", "Timeout (ms)"])
 
     def _updateColAttrs(self, grid):
         content = self.GetData()
@@ -65,7 +66,7 @@ class MBRequestDataTable (CustomTable):
                 renderer = None
                 colname = self.GetColLabelValue(col, False)
 
-                if colname in ["Name", "Address", "Len", "Device ID", "Period", "Timeout"]:
+                if colname in ["Name", "Address", "Len", "Device ID", "Period (ms)", "Timeout (ms)"]:
                     editor = wx.grid.GridCellTextEditor()
                 elif colname == "Transfer method":
                     editor = wx.grid.GridCellChoiceEditor()
@@ -150,8 +151,8 @@ class MBRequestDataPanel (wx.Panel):
                 "Description": DESCRIPTION,
                 "Device ID" : "1",
                 "Transfer method" : "Periodic",
-                "Period" : "100",
-                "Timeout" : "100",}
+                "Period (ms)" : "100",
+                "Timeout (ms)" : "100",}
         self.Table = MBRequestDataTable(self)
         self.ColAlignements = [wx.ALIGN_RIGHT] + \
                               [wx.ALIGN_LEFT]*(len(self.VariablesDefaultValue))
@@ -234,8 +235,8 @@ class MBRequestDataPanel (wx.Panel):
                 "Device ID": "",
                 "Data type": u"WORD",
                 "Transfer method": "",
-                "Period": "",
-                "Timeout": "",
+                "Period (ms)": "100",
+                "Timeout (ms)": "100",
                 "Description": MASTER_OPTION,
                 "Modbus type": self.masterSelectCmbx.cmbbox.GetStringSelection()}
 

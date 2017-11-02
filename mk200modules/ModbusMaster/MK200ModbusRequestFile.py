@@ -126,8 +126,8 @@ class MK200ModbusRequestFile (CodeFile):
                           "Address" : var.getaddress(),
                           "Len" : var.getlen(),
                           "Transfer method" : var.gettxtype(),
-                          "Period" : var.getperiod(),
-                          "Timeout" : timeOut,
+                          "Period (ms)" : var.getperiod(),
+                          "Timeout (ms)" : timeOut,
                           })
         return datas
 
@@ -143,8 +143,8 @@ class MK200ModbusRequestFile (CodeFile):
             variable.setlen(var["Len"])
             variable.setdesc(var["Description"])
             variable.settxtype(var["Transfer method"])
-            variable.setperiod(var["Period"])
-            variable.settimeout(var["Timeout"])
+            variable.setperiod(var["Period (ms)"])
+            variable.settimeout(var["Timeout (ms)"])
             self.CodeFile.variables.appendvariable(variable)
 
     def GetIconName(self):
@@ -303,10 +303,10 @@ class MK200ModbusRequestFile (CodeFile):
             else:
                 requestStruct += "\t0,\n"
                 requestStruct += "\t0,\n"
-            requestStruct += "\t{},\n".format(request["Timeout"])
+            requestStruct += "\t{},\n".format(request["Timeout (ms)"])
             requestStruct += "\t{},\n".format(request["Device ID"])
             requestStruct += "\t0,\n"
-            requestStruct += "\t{},\n".format(request["Period"])
+            requestStruct += "\t{},\n".format(request["Period (ms)"])
             requestStruct += "\t{},\n".format(request["Address"])
             requestStruct += "\t{},\n".format(request["Len"])
             requestStruct += "\t{}_reqGetHandler,\n".format(request["Name"])
