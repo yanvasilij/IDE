@@ -41,7 +41,7 @@ class MK201Object():
                                    "method" : '_callConfigurator'})
         self.projectPath = self._confnodesroot.GetProjectPath()
         self.projectName = self._confnodesroot.GetProjectName()
-        self.hexfilepath = self._confnodesroot.GetProjectPath() + '\\build\\' + self.projectName + '.hex'
+        self.hexfilepath = os.path.join(self._confnodesroot.GetProjectPath(), 'build',self.projectName + '.hex')
         self.PLCStatus = "Disconnected"
         self.comport = comportstr
         self.TransactionLock.acquire()
