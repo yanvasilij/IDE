@@ -18,7 +18,7 @@ DIV_END = "\n" + ("*"*82) + "/\n"
 
 TEAXLABEL_SIZE = (120, 21)
 SETTINGSWIDGET_SIZE = (100, 21)
-BAUDRATE_LIST = ('1000', '800', '500', '250', '125')
+BAUDRATE_LIST = ('1000', '500', '250', '125', '100','50', '20')
 DESCRIPTION = ["HeartbeatTime", "Baudrate", "DataUpdateTime"]
 
 # class CANOpenSettingsChannelEditor(wx.Panel):

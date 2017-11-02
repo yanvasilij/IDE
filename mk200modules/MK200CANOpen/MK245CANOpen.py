@@ -146,11 +146,11 @@ class MK245CANOpenFile (MK200CANOpenFile):
                 "Type" : u"DINT",
                 "Initial": "",
                 "Description": "On board freq in",
-                "OnChange":"",
-                "Options":"Couter"})
+                "OnChange": "",
+                "Options": "Counter"})
         defaultConfig.append({
             "Name" : "Node_ID_{}".format(cobeID),
-            "Address" : "127",
+            "Address" : "125",
             "Len" : "",
             "Type" : u"INT",
             "Initial": "",
@@ -166,6 +166,7 @@ class MK245CANOpenFile (MK200CANOpenFile):
         codeFileVariables = self.CodeFileVariables(self.CodeFile)
         if len(codeFileVariables) == 0:
             datas = self.GenerateDefaultVariables()
+            print(datas)
             return datas
         for var in self.CodeFileVariables(self.CodeFile):
             datas.append({"Name" : var.getname(),
@@ -226,8 +227,8 @@ class MK245CANOpenFile (MK200CANOpenFile):
         text = ""
         text += "extern \"C\" int __init_%s(int argc,char **argv)\n"%location_str
         text += "{\n"
-        ao_config = [i for i in self.GetVariables() if i["Description"] == FREQ_DESCRIPTION]
-        for config in ao_config:
+        frq_config = [i for i in self.GetVariables() if i["Description"] == FREQ_DESCRIPTION]
+        for config in frq_config:
             channel = config["Name"][-1]
             if config["Options"] == "Off":
                 text += "    mk245_{0}.freqChannel[{1}].mode = 0;\n".format(location_str, channel)

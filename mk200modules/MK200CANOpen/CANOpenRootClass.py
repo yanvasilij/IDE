@@ -111,12 +111,14 @@ class RootClass(MK200CANOpenFile):
         self_node_id = self.GetOneParameterByDesc("Node ID", "Address", "0x7F")
         heartbeat_time = self.GetOneParameterByDesc("HeartbeatTime", "Value", "500")
         data_update_time = self.GetOneParameterByDesc("DataUpdateTime", "Value", "500")
+        baudrate = self.GetOneParameterByDesc("Baudrate", "Value", "1000")
         text = ""
         text += "extern \"C\" int __init_%s(int argc,char **argv)\n"%location_str
         text += "{\n"
         text += "    mk200CANOpenMaster.selfNodeId = {};\n".format(self_node_id)
         text += "    mk200CANOpenMaster.consumerHeartbeatTime = {};\n".format(heartbeat_time)
         text += "    mk200CANOpenMaster.pdoEventTimer = {};\n".format(data_update_time)
+        text += "    initMk200CanOpenMaster({});\n".format(baudrate)
         text += "    return 0;\n"
         text += "}\n"
         return text
