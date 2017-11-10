@@ -37,6 +37,7 @@ class MK200Beremiz(BeremizIDELauncher):
             ('Native', 'NativeLib.NativeLibrary'),
             ('MK200',  'mk200libs.MK200Library'),
             ('MK200Modbus',  'mk200libs.MK200Modbus'),
+            ('MK200Time',  'mk200libs.MK200Time'),
             ('AdditionalConversionTypes',  'mk200libs.MK200AdditionalConversion')]
 
         from util.BitmapLibrary import AddBitmapFolder
